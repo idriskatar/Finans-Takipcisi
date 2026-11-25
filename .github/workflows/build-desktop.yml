@@ -14,18 +14,22 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Windows (NSIS)
+          - name: Windows (NSIS + MSI)
             os: windows-latest
-            args: '--bundles nsis'
+            args: ''
+            artifact: desktop/src-tauri/target/release/bundle/{nsis/*.exe,msi/*.msi}
           - name: macOS (Apple Silicon)
             os: macos-latest
-            args: '--bundles dmg --target aarch64-apple-darwin'
+            args: '--target aarch64-apple-darwin'
+            artifact: desktop/src-tauri/target/release/bundle/dmg/*.dmg
           - name: macOS (Intel)
             os: macos-latest
-            args: '--bundles dmg --target x86_64-apple-darwin'
-          - name: Linux (AppImage)
+            args: '--target x86_64-apple-darwin'
+            artifact: desktop/src-tauri/target/release/bundle/dmg/*.dmg
+          - name: Linux (AppImage + deb)
             os: ubuntu-22.04
-            args: '--bundles appimage'
+            args: ''
+            artifact: desktop/src-tauri/target/release/bundle/{appimage/*.AppImage,deb/*.deb}
     permissions:
       contents: write
 
@@ -52,6 +56,7 @@ jobs:
           workspaces: desktop/src-tauri -> target
 
       - name: Derle ve sürüm yayınla
+        id: tauri
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -66,3 +71,10 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
+
+      - name: Paketleri Actions Artifacts olarak yükle
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ strategy.job-index }}
+          path: ${{ matrix.artifact }}
+          if-no-files-found: warn

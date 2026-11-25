@@ -64,16 +64,19 @@ jobs:
           if-no-files-found: warn
 
   ios:
-    name: iOS (.app)
+    name: iOS (simulator .app, imzasız)
     runs-on: macos-latest
     steps:
       - name: Kaynak kod
         uses: actions/checkout@v4
 
+      - name: Xcode seç
+        run: sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+
       - name: Rust araç zinciri (iOS hedefleri)
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-apple-ios,x86_64-apple-ios
+          targets: aarch64-apple-ios-sim,aarch64-apple-ios,x86_64-apple-ios
 
       - name: Tauri CLI
         run: cargo install tauri-cli --version '^2' --locked
@@ -89,15 +92,19 @@ jobs:
           CI: 'true'
         run: cargo tauri ios init --ci
 
-      - name: iOS derle
+      # Apple Developer Team ID / sertifika olmadığı için cihaz/IPA imzalanamaz.
+      # Simulator hedefi imza gerektirmez; derlemenin doğrulanması için kullanılır.
+      - name: iOS simulator derle (imzasız)
         working-directory: mobile/src-tauri
-        run: cargo tauri ios build
+        env:
+          CI: 'true'
+        run: cargo tauri ios build --target aarch64-sim --ci
 
       - name: .app yükleniyor
         uses: actions/upload-artifact@v4
         with:
-          name: ios-app
+          name: ios-simulator-app
           path: |
-            mobile/src-tauri/gen/mobile/**
+            mobile/src-tauri/gen/apple/**
             mobile/src-tauri/target/**/*.app
           if-no-files-found: warn

@@ -50,14 +50,30 @@ eklentisi gerekir — şu an alarm bildirimi uygulama içi toast olarak çalış
 
 ## iOS adımları (macOS + Xcode'lu makinede)
 
+**CI'da imzasız simulator derlemesi** (Team ID gerekmez, `Build Mobile` workflow'u bunu yapar):
+
 ```bash
 cd mobile/src-tauri
-cargo tauri ios init
-cargo tauri ios build               # .app / IPA
+rustup target add aarch64-apple-ios-sim
+cargo tauri ios init --ci
+cargo tauri ios build --target aarch64-sim --ci
 ```
 
-Xcode signing (Team ID / provisioning profile) sizin Apple geliştirici hesabınızdan
-ayarlanmalı. App Store dağıtımı için `cargo tauri ios build --export` kullanılır.
+Bu çıktı simulator içinde çalışır; **cihaza kurulamaz / App Store'a yüklenemez**.
+
+**Cihaz / App Store için imzalı IPA** (Apple Developer hesabı gerekir):
+
+```bash
+export APPLE_DEVELOPMENT_TEAM=XXXXXXXXXX        # Team ID
+export APPLE_API_KEY=...                        # App Store Connect API key
+export APPLE_API_ISSUER=...
+export APPLE_API_KEY_PATH=/path/AuthKey_XXX.p8
+cargo tauri ios build --export-method app-store-connect
+```
+
+veya `IOS_CERTIFICATE` / `IOS_CERTIFICATE_PASSWORD` / `IOS_MOBILE_PROVISION`
+(değişkenleri base64) ile manuel imzalama. Bu değerleri GitHub **Repository secrets**
+olarak ekleyip workflow'da env olarak vermeniz gerekir.
 
 ## Sonraki iyileştirmeler (mobil)
 

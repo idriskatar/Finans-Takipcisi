@@ -37,8 +37,8 @@ git push -u origin main
 
 | Workflow | Job'lar | Çıktı |
 |---|---|---|
-| `Build Desktop` | Windows (NSIS), macOS ARM/Intel (DMG), Linux (AppImage) | GitHub **Releases** → taslak sürüm |
-| `Build Mobile` | Android (APK + AAB), iOS (.app) | GitHub **Actions > Artifacts** |
+| `Build Desktop` | Windows (NSIS **+ MSI**), macOS ARM/Intel (DMG), Linux (AppImage + deb) | GitHub **Releases** (taslak) **ve** Actions **Artifacts** |
+| `Build Mobile` | Android (APK + AAB), iOS (imzasız simulator `.app`) | GitHub **Actions > Artifacts** |
 
 Etiket göndermek:
 
@@ -53,9 +53,13 @@ workflow sayfasındaki **Artifacts** bölümünden indirilir.
 
 ### Notlar
 
-- iOS job'u `macos-latest` üzerinde çalışır; imzalama/provisioning için Apple Developer
-  hesabınız gerekebilir (workflow şimdilik unsigned `.app` üretir).
-- Android job'u Java 17 + Android SDK'yı CI'da kurar; ekstra secret gerekmez.
+- iOS job'u `macos-latest` üzerinde çalışır ve **imzasız simulator `.app`** üretir
+  (`--target aarch64-sim --ci`). Team ID / sertifika olmadan cihaz/ipa derlenemediği için
+  bu tercih edildi. İmzalı IPA için `MOBILE_PLAN.md` içindeki Apple secret'larını ekleyin.
+- Android job'u Java 17 + runner'ın hazır Android SDK'sını kullanır; `setup-android@v3`
+  kaldırıldı (deprecated `tools` paketi hatası).
+- Masaüstü paketleri hem Releases'e hem Actions Artifacts'a yüklenir; Windows job'u
+  NSIS + MSI üretir.
 - İlk derleme Rust bağımlılıkları nedeniyle uzun sürebilir; `swatinem/rust-cache` sonraki
   derlemeleri hızlandırır.
 
