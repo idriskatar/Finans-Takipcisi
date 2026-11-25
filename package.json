@@ -1,0 +1,16 @@
+{
+  "name": "harem-gateway",
+  "version": "0.2.0",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node gateway.mjs",
+    "debug": "node gateway.mjs --debug"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.8.1"
+  }
+}

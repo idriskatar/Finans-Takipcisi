@@ -1,0 +1,68 @@
+name: Build Desktop
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows (NSIS)
+            os: windows-latest
+            args: '--bundles nsis'
+          - name: macOS (Apple Silicon)
+            os: macos-latest
+            args: '--bundles dmg --target aarch64-apple-darwin'
+          - name: macOS (Intel)
+            os: macos-latest
+            args: '--bundles dmg --target x86_64-apple-darwin'
+          - name: Linux (AppImage)
+            os: ubuntu-22.04
+            args: '--bundles appimage'
+    permissions:
+      contents: write
+
+    steps:
+      - name: Kaynak kod
+        uses: actions/checkout@v4
+
+      - name: Linux bağımlılıkları
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev build-essential curl wget file \
+            libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Rust araç zinciri
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ runner.os == 'macOS' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Rust önbelleği
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: desktop/src-tauri -> target
+
+      - name: Derle ve sürüm yayınla
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: desktop/src-tauri
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Finans Takipçisi v__VERSION__'
+          releaseBody: |
+            Finans Takipçisi — çok platformlu masaüstü uygulaması.
+            Geliştirici: İdris KATAR · Lisans: MIT
+            Mobil paketler ayrı workflow'larda üretilir (Actions > Artifacts).
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}

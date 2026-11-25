@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "mobile-default",
+  "description": "Mobil finans takipçisi izinleri",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

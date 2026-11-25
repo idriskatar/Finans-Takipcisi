@@ -1,0 +1,38 @@
+# Node (eski gateway)
+node_modules/
+npm-debug.log*
+
+# Rust / Tauri
+desktop/src-tauri/target/
+desktop/src-tauri/gen/
+desktop/src-tauri/.cargo/
+core/target/
+mobile/src-tauri/target/
+mobile/src-tauri/gen/
+mobile/src-tauri/.cargo/
+
+# Derlenmiş çıktılar
+*.exe
+*.msi
+*.appx
+*.dmg
+*.AppImage
+*.deb
+*.rpm
+*.pdb
+*.ilk
+*.obj
+
+# Geçici / yerel
+*.log
+.env
+.env.local
+.DS_Store
+Thumbs.db
+test-tcmb.ps1
+durum.txt
+SONUÇ.md
+SONUC_FINAL.md
+DUZENLEME_DURUMU.md
+PORT_DEGISTIRILDI.md
+onizleme-kartlar.html

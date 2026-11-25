@@ -1,0 +1,95 @@
+name: Build Mobile
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  android:
+    name: Android (APK + AAB)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kaynak kod
+        uses: actions/checkout@v4
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Rust araç zinciri (Android hedefleri)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - name: Tauri CLI
+        run: cargo install tauri-cli --version '^2' --locked
+
+      - name: Rust önbelleği
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: mobile/src-tauri -> target
+
+      - name: Android projesini başlat
+        working-directory: mobile/src-tauri
+        env:
+          CI: 'true'
+        run: cargo tauri android init --ci
+
+      - name: Android derle
+        working-directory: mobile/src-tauri
+        run: cargo tauri android build
+
+      - name: APK/AAB yükleniyor
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-packages
+          path: |
+            mobile/src-tauri/gen/android/app/build/outputs/**/*.apk
+            mobile/src-tauri/gen/android/app/build/outputs/**/*.aab
+          if-no-files-found: warn
+
+  ios:
+    name: iOS (.app)
+    runs-on: macos-latest
+    steps:
+      - name: Kaynak kod
+        uses: actions/checkout@v4
+
+      - name: Rust araç zinciri (iOS hedefleri)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios,x86_64-apple-ios
+
+      - name: Tauri CLI
+        run: cargo install tauri-cli --version '^2' --locked
+
+      - name: Rust önbelleği
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: mobile/src-tauri -> target
+
+      - name: iOS projesini başlat
+        working-directory: mobile/src-tauri
+        env:
+          CI: 'true'
+        run: cargo tauri ios init --ci
+
+      - name: iOS derle
+        working-directory: mobile/src-tauri
+        run: cargo tauri ios build
+
+      - name: .app yükleniyor
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-app
+          path: |
+            mobile/src-tauri/gen/mobile/**
+            mobile/src-tauri/target/**/*.app
+          if-no-files-found: warn

@@ -1,0 +1,19 @@
+[package]
+name = "finans-core"
+version = "1.0.0"
+description = "Finans Takipçisi — paylaşılan veri motoru (Harem/TCMB/BIST/Kripto, önbellek, REST+SSE)"
+authors = ["İdris KATAR"]
+license = "MIT"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "gzip"] }
+tokio-tungstenite = { version = "0.24", features = ["rustls-tls-webpki-roots"] }
+futures-util = "0.3"
+regex = "1"
+chrono = { version = "0.4", features = ["serde"] }
+axum = "0.8"
+tokio-stream = { version = "0.1", features = ["sync"] }

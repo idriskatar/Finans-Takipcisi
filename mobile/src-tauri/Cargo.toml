@@ -1,0 +1,20 @@
+[package]
+name = "finans-takipcisi-mobile"
+version = "1.0.0"
+description = "Finans Takipçisi — mobil (Android/iOS)"
+authors = ["İdris KATAR"]
+license = "MIT"
+edition = "2021"
+
+[lib]
+name = "finans_takipcisi_mobile_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+finans-core = { path = "../../core" }
+tauri = { version = "2", features = ["image-png"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
