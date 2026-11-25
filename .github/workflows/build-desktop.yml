@@ -14,22 +14,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Windows (NSIS + MSI)
+          # WiX/MSI derlemesi Windows-1252 kod sayfası nedeniyle Türkçe karakterlerde
+          # başarısız oluyor (LGHT0311); bu yüzden CI'da yalnızca NSIS üretiliyor.
+          - name: Windows (NSIS)
             os: windows-latest
-            args: ''
-            artifact: desktop/src-tauri/target/release/bundle/{nsis/*.exe,msi/*.msi}
+            args: '--bundles nsis'
           - name: macOS (Apple Silicon)
             os: macos-latest
-            args: '--target aarch64-apple-darwin'
-            artifact: desktop/src-tauri/target/release/bundle/dmg/*.dmg
+            args: '--bundles dmg --target aarch64-apple-darwin'
           - name: macOS (Intel)
             os: macos-latest
-            args: '--target x86_64-apple-darwin'
-            artifact: desktop/src-tauri/target/release/bundle/dmg/*.dmg
+            args: '--bundles dmg --target x86_64-apple-darwin'
           - name: Linux (AppImage + deb)
             os: ubuntu-22.04
-            args: ''
-            artifact: desktop/src-tauri/target/release/bundle/{appimage/*.AppImage,deb/*.deb}
+            args: '--bundles appimage,deb'
     permissions:
       contents: write
 
@@ -72,9 +70,17 @@ jobs:
           prerelease: false
           args: ${{ matrix.args }}
 
+      # Çapraz derlemede çıktı target/<triple>/release/bundle/ altına gider;
+      # recursive glob hem o yolu hem normal yolu kapsar.
       - name: Paketleri Actions Artifacts olarak yükle
         uses: actions/upload-artifact@v4
         with:
           name: desktop-${{ strategy.job-index }}
-          path: ${{ matrix.artifact }}
+          path: |
+            desktop/src-tauri/target/**/bundle/**/*.exe
+            desktop/src-tauri/target/**/bundle/**/*.dmg
+            desktop/src-tauri/target/**/bundle/**/*.AppImage
+            desktop/src-tauri/target/**/bundle/**/*.deb
+            desktop/src-tauri/target/**/bundle/**/*.app.tar.gz
+            desktop/src-tauri/target/**/bundle/**/*.app
           if-no-files-found: warn

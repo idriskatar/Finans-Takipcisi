@@ -50,18 +50,43 @@ jobs:
           CI: 'true'
         run: cargo tauri android init --ci
 
-      - name: Android derle
+      - name: Android derle (APK)
         working-directory: mobile/src-tauri
-        run: cargo tauri android build
+        run: cargo tauri android build --apk
 
-      - name: APK/AAB yükleniyor
+      # Android, imzasız APK'yı yüklemeyi reddeder. CI'da geçici bir debug anahtarı
+      # üretip APK'yı bununla imzalıyoruz (secret gerekmez, telefon kurulumu çalışır).
+      - name: Debug anahtarı üret ve APK'yı imzala
+        shell: bash
+        run: |
+          set -e
+          KEYSTORE="$RUNNER_TEMP/finans-debug.jks"
+          keytool -genkeypair -v -keystore "$KEYSTORE" \
+            -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass android -keypass android \
+            -dname "CN=Android Debug,O=Finans Takipcisi,C=TR" >/dev/null 2>&1
+
+          UNSIGNED=$(find mobile/src-tauri/gen/android/app/build/outputs -name '*unsigned*.apk' | head -n 1)
+          if [ -z "$UNSIGNED" ]; then
+            echo "İmzalanmamış APK bulunamadı"; exit 1
+          fi
+          BT=$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -n 1)
+          ALIGNED="$RUNNER_TEMP/aligned.apk"
+          "$ANDROID_HOME/build-tools/$BT/zipalign" -f -p 4 "$UNSIGNED" "$ALIGNED"
+          OUT="mobile/src-tauri/gen/android/app/build/outputs/Finans-Takipcisi-1.0.0-debug-signed.apk"
+          "$ANDROID_HOME/build-tools/$BT/apksigner" sign \
+            --ks "$KEYSTORE" --ks-key-alias androiddebugkey \
+            --ks-pass pass:android --key-pass pass:android \
+            --out "$OUT" "$ALIGNED"
+          "$ANDROID_HOME/build-tools/$BT/apksigner" verify --print-certs "$OUT"
+          echo "İmzalı APK: $OUT"
+
+      - name: Kurulabilir APK yükleniyor
         uses: actions/upload-artifact@v4
         with:
-          name: android-packages
-          path: |
-            mobile/src-tauri/gen/android/app/build/outputs/**/*.apk
-            mobile/src-tauri/gen/android/app/build/outputs/**/*.aab
-          if-no-files-found: warn
+          name: android-install-apk
+          path: mobile/src-tauri/gen/android/app/build/outputs/Finans-Takipcisi-1.0.0-debug-signed.apk
+          if-no-files-found: error
 
   ios:
     name: iOS (simulator .app, imzasız)

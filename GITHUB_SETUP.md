@@ -37,8 +37,8 @@ git push -u origin main
 
 | Workflow | Job'lar | Çıktı |
 |---|---|---|
-| `Build Desktop` | Windows (NSIS **+ MSI**), macOS ARM/Intel (DMG), Linux (AppImage + deb) | GitHub **Releases** (taslak) **ve** Actions **Artifacts** |
-| `Build Mobile` | Android (APK + AAB), iOS (imzasız simulator `.app`) | GitHub **Actions > Artifacts** |
+| `Build Desktop` | Windows (NSIS), macOS ARM/Intel (DMG), Linux (AppImage + deb) | GitHub **Releases** (taslak) **ve** Actions **Artifacts** |
+| `Build Mobile` | Android (**kurulabilir imzalı APK**), iOS (imzasız simulator `.app`) | GitHub **Actions > Artifacts** → `android-install-apk`, `ios-simulator-app` |
 
 Etiket göndermek:
 
@@ -58,8 +58,13 @@ workflow sayfasındaki **Artifacts** bölümünden indirilir.
   bu tercih edildi. İmzalı IPA için `MOBILE_PLAN.md` içindeki Apple secret'larını ekleyin.
 - Android job'u Java 17 + runner'ın hazır Android SDK'sını kullanır; `setup-android@v3`
   kaldırıldı (deprecated `tools` paketi hatası).
-- Masaüstü paketleri hem Releases'e hem Actions Artifacts'a yüklenir; Windows job'u
-  NSIS + MSI üretir.
+- Masaüstü paketleri hem Releases'e hem Actions Artifacts'a yüklenir.
+- **MSI neden yok?** WiX 3, Windows-1252 kod sayfası kullanıyor; "Finans Takipçisi"
+  içindeki `ç` karakterini kodlayamıyor (`LGHT0311`). Bu yüzden CI Windows job'u
+  yalnızca NSIS üretir. MSI'ye ihtiyacınız olursa `productName`'i ASCII yapıp
+  `--bundles nsis,msi` kullanabilirsiniz (marka adı değişir) veya WiX'i 65001
+  kod sayfasıyla özelleştiren bir `.wxl` fragment'i ekleyebilirsiniz. NSIS kurulum
+  paketi Türkçe karakterleri sorunsuz destekler.
 - İlk derleme Rust bağımlılıkları nedeniyle uzun sürebilir; `swatinem/rust-cache` sonraki
   derlemeleri hızlandırır.
 

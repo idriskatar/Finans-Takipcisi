@@ -45,6 +45,37 @@ cargo tauri android build          # APK → mobile/src-tauri/gen/android/app/bu
 `capabilities/mobile.json` içine `http` permission'ları gerekirse eklenir;
 `INTERNET` izni Tauri tarafından otomatik eklenir.
 
+### APK neden kurulamıyordu?
+`cargo tauri android build` varsayılan olarak **imzasız** APK üretir; Android ise
+imzasız APK'yı yüklemeyi reddeder (`INSTALL_PARSE_FAILED_NO_CERTIFICATES`).
+"İmzasız ama kurulabilir" diye bir şey yoktur — en azından debug anahtarıyla
+imzalanmış olması gerekir.
+
+**CI çözümü (`Build Mobile` workflow'u bunu yapar):** geçici bir debug keystore
+üretir, `zipalign` + `apksigner` ile APK'yı imzalar ve doğrular. Secret gerekmez.
+Artifact adı: **`android-install-apk`** → `Finans-Takipcisi-1.0.0-debug-signed.apk`.
+Telefonda "Bilinmeyen kaynaklardan yükleme" iznini açıp bu APK'yı kurabilirsiniz.
+
+**Yerel imzalama (opsiyonel):**
+```bash
+# Debug keystore zaten varsa: ~/.android/debug.keystore (şifre: android, alias: androiddebugkey)
+keytool -genkeypair -v -keystore ~/.android/debug.keystore \
+  -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 \
+  -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
+```
+Sonra `gen/android/keystore.properties` oluşturun:
+```
+storeFile=/home/<kullanici>/.android/debug.keystore
+storePassword=android
+keyAlias=androiddebugkey
+keyPassword=android
+```
+veya CI'daki gibi `apksigner sign --ks ~/.android/debug.keystore ...` kullanın.
+
+⚠️ Debug anahtarıyla imzalanmış APK ile yayın anahtarlı sürüm aynı paket adında
+yüklenemez; güncellemede önce mevcut uygulamayı kaldırın. Play Store için kendi
+upload keystore'ınızı ve secret'ları kullanın.
+
 Bildirimler için (Android 13+) `POST_NOTIFICATIONS` izni ve bir Tauri notification
 eklentisi gerekir — şu an alarm bildirimi uygulama içi toast olarak çalışır.
 
