@@ -118,6 +118,9 @@ olarak ekleyip workflow'da env olarak vermeniz gerekir.
 4. Durum çubuğu: `viewport-fit=cover` + `env(safe-area-inset-top/bottom)` ölçümüyle
    başlık ve alt navigasyon Android bildirim ikonları / gesture bar ile çakışmaz
    (`--safe-top` / `--safe-bottom`; env 0 döndürürse Android için 28px yedek).
+5. Favori aktarımı: **Dışa aktar / İçe aktar / Temizle** düğmeleri listenin **altında**;
+   metin alanı yerine `tauri-plugin-dialog` ile yerel JSON dosyası seçilir. Yeni invoke
+   komutları: `read_json_file`, `write_json_file` (yalnızca `.json` kabul edilir).
 4. UI polishing: pull-to-refresh, büyük dokunma alanları, güncelleme animasyonu.
 5. Favori aktarımı ve fiyat alarmı: masaüstündeki mantık `core`'a taşınabilir / mobil UI'a eklenebilir.
 
