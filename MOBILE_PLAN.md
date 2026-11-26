@@ -20,8 +20,12 @@ Finance/
 - ✅ `core/` crate'i: tüm veri kaynakları, disk önbelleği, kaynak sağlığı, favori/ayar dosyası.
 - ✅ Masaüstü `core`'a geçirildi ve `cargo check` geçiyor.
 - ✅ `mobile/` Tauri projesi: `cargo check` geçiyor.
-- ✅ Mobil arayüz taslağı: 6 sekme (Favoriler/Harem/BIST/TCMB/Kripto/Ayarlar), favori yıldızları,
-  tema seçimi, kaynak durumu, Hakkında (İdris KATAR + veri kaynakları + MIT).
+- ✅ Mobil arayüz: 6 sekme (Favoriler/Harem/BIST/TCMB/Kripto/Ayarlar) ve masaüstüyle
+  **özellik eşitliği**: kategori sekmeleri + arama + şüpheli filtresi (Harem), BIST sıralama
+  ve endeks kartı, TCMB saat başı + gösterge + birim/nakit kurlar, kripto özet kartları +
+  alt sekmeler + arama + sıralama + 24s aralık çubuğu + hacim, favorilerde **fiyat alarmı**
+  ve JSON dışa/içe aktarım, tema + yenileme aralığı + spread eşiği ayarları, kaynak durumu,
+  Hakkında (İdris KATAR + veri kaynakları + MIT). Tüm detaylar genişletilebilir kartlarda.
 - ✅ Android/iOS ikon seti üretildi (`cargo tauri icon ../icon-1024.png`).
 
 ## Bu ortamda yapılamayanlar
@@ -111,6 +115,9 @@ olarak ekleyip workflow'da env olarak vermeniz gerekir.
 1. Arka plan veri yenileme: Android `WorkManager` / iOS Background Fetch.
 2. Gerçek push bildirim: FCM (Android) + APNs (iOS) — sunucu tarafı gerektirir.
 3. Çevrimdışı mod: `core` önbelleği zaten var; mobil arayüzde "son veri" damgası gösterilir.
+4. Durum çubuğu: `viewport-fit=cover` + `env(safe-area-inset-top/bottom)` ölçümüyle
+   başlık ve alt navigasyon Android bildirim ikonları / gesture bar ile çakışmaz
+   (`--safe-top` / `--safe-bottom`; env 0 döndürürse Android için 28px yedek).
 4. UI polishing: pull-to-refresh, büyük dokunma alanları, güncelleme animasyonu.
 5. Favori aktarımı ve fiyat alarmı: masaüstündeki mantık `core`'a taşınabilir / mobil UI'a eklenebilir.
 

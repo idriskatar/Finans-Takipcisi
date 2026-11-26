@@ -3,215 +3,242 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a2029" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#eef0f2" media="(prefers-color-scheme: light)">
 <title>Finans Takipçisi</title>
 <style>
-:root{color-scheme:light dark;--bg:#eef0f2;--panel:#fff;--ink:#1a1f27;--mute:#6b7380;--line:#dde1e6;--brass:#8a6210;--up:#157a66;--down:#b83a32;--box:#f4f6f8}
-:root[data-theme=dark]{--bg:#12161c;--panel:#1a2029;--ink:#e8ebef;--mute:#8d96a3;--line:#2b333f;--brass:#d9a840;--up:#43c4a8;--down:#ef7a70;--box:#222a35}
+:root{color-scheme:light dark;--bg:#eef0f2;--panel:#fff;--ink:#1a1f27;--mute:#6b7380;--line:#dde1e6;--brass:#8a6210;--up:#157a66;--down:#b83a32;--warn:#a35a00;--box:#f4f6f8;--boxline:#e3e7ec}
+:root[data-theme=dark]{--bg:#12161c;--panel:#1a2029;--ink:#e8ebef;--mute:#8d96a3;--line:#2b333f;--brass:#d9a840;--up:#43c4a8;--down:#ef7a70;--warn:#e0a24a;--box:#222a35;--boxline:#333d4a}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,"Segoe UI",sans-serif;padding-bottom:70px}
-header{position:sticky;top:0;z-index:10;background:var(--panel);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,"Segoe UI",sans-serif;padding-bottom:calc(74px + var(--safe-bottom,0px))}
+header{position:sticky;top:0;z-index:10;background:var(--panel);border-bottom:1px solid var(--line);padding:calc(10px + var(--safe-top,env(safe-area-inset-top,0px))) 14px 10px;display:flex;align-items:center;justify-content:space-between}
 header h1{font-size:16px;margin:0;letter-spacing:.02em;color:var(--brass)}
-header .st{font-size:12px;color:var(--mute)}
-main{padding:14px 12px 20px;max-width:760px;margin:0 auto}
+header .st{font-size:11.5px;color:var(--mute)}
+main{padding:12px 12px 20px;max-width:760px;margin:0 auto}
 .view{display:none}.view.on{display:block}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+input[type=search],select,input[type=number]{font:inherit;font-size:13px;padding:7px 9px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:7px;min-width:0}
+input[type=search]{width:100%;margin-bottom:10px}
+.toolrow{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.toolrow select{flex:1;min-width:120px}
+button.ghost,button.mini{font:inherit;font-size:12px;padding:5px 9px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:6px;cursor:pointer}
+button.mini{padding:3px 7px;font-size:11px}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:10px}
+.chips::-webkit-scrollbar{display:none}
+.chips button{white-space:nowrap;font:inherit;font-size:12px;padding:5px 10px;border:1px solid var(--line);background:var(--panel);color:var(--mute);border-radius:99px;cursor:pointer}
+.chips button.on{background:var(--brass);border-color:var(--brass);color:#fff;font-weight:650}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 12px;margin-bottom:9px}
 .card .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
 .card .nm{font-weight:650;font-size:14px}
-.card .cd{font-size:11px;color:var(--mute)}
-.card .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px;font-size:13px;font-variant-numeric:tabular-nums}
-.up{color:var(--up)}.down{color:var(--down)}.mute{color:var(--mute)}
-.star{border:0;background:none;font-size:22px;color:var(--mute);cursor:pointer;padding:0 6px}
+.card .cd{font-size:11px;color:var(--mute);margin-left:6px}
+.card .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;font-size:13px;font-variant-numeric:tabular-nums}
+.card .sub{font-size:11.5px;color:var(--mute);margin-top:5px}
+.up{color:var(--up)}.down{color:var(--down)}.mute{color:var(--mute)}.warn{color:var(--warn)}
+.badge{font-size:10.5px;border:1px solid var(--warn);color:var(--warn);border-radius:4px;padding:1px 5px;margin-left:6px}
+details{margin-top:7px}
+summary{font-size:11.5px;color:var(--mute);cursor:pointer}
+details .kv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:12px;margin-top:7px;font-variant-numeric:tabular-nums}
+details .kv span:nth-child(odd){color:var(--mute)}
+.star{border:0;background:none;font-size:21px;color:var(--mute);cursor:pointer;padding:0 4px;line-height:1}
 .star[aria-pressed=true]{color:var(--brass)}
-.sub{font-size:12px;font-weight:700;color:var(--brass);text-transform:uppercase;letter-spacing:.05em;margin:16px 4px 8px}
-nav{position:fixed;bottom:0;left:0;right:0;z-index:20;background:var(--panel);border-top:1px solid var(--line);display:flex;overflow-x:auto}
-nav button{flex:1;min-width:60px;border:0;background:none;color:var(--mute);font:600 10.5px system-ui;padding:10px 4px calc(10px + env(safe-area-inset-bottom));cursor:pointer}
-nav button.on{color:var(--brass)}
-.empty{padding:24px;text-align:center;color:var(--mute);font-size:13px}
-.pill{display:inline-block;font-size:11px;padding:2px 7px;border-radius:99px;background:var(--box);color:var(--mute)}
+.section{font-size:12px;font-weight:700;color:var(--brass);text-transform:uppercase;letter-spacing:.05em;margin:16px 4px 8px}
+.empty{padding:22px;text-align:center;color:var(--mute);font-size:13px}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mute);margin-right:6px}
-.dot.ok{background:var(--up)}.dot.cached{background:var(--brass)}.dot.err{background:var(--down)}
-.setting{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:8px;font-size:13.5px}
-.setting select{padding:6px 8px;border-radius:6px;border:1px solid var(--line);background:var(--box);color:var(--ink)}
+.dot.ok{background:var(--up)}.dot.cached{background:var(--warn)}.dot.err{background:var(--down)}
+.setting{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px;margin-bottom:8px;font-size:13.5px}
+.kcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.kpi{background:var(--box);border:1px solid var(--boxline);border-radius:9px;padding:9px;min-width:0}
+.kpi .lb{font-size:10px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .v{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:11px;color:var(--mute)}
+.rng{position:relative;height:3px;background:var(--boxline);border-radius:2px;margin-top:5px}
+.rng i{position:absolute;top:-2px;width:7px;height:7px;background:var(--brass);border-radius:50%}
+.io{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.io textarea{width:100%;min-height:90px;font:12px monospace;padding:8px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink)}
+.alarmrow{display:flex;gap:6px;align-items:center;margin-top:7px}
+.alarmrow input{width:88px}
+.toast{position:fixed;left:14px;right:14px;bottom:calc(82px + var(--safe-bottom,0px));z-index:50;background:var(--panel);border:1px solid var(--brass);border-left:4px solid var(--brass);border-radius:9px;padding:11px 13px;box-shadow:0 8px 24px rgba(0,0,0,.3);font-size:13px}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:20;background:var(--panel);border-top:1px solid var(--line);display:flex;overflow-x:auto}
+nav button{flex:1;min-width:58px;border:0;background:none;color:var(--mute);font:600 10.5px system-ui;padding:9px 3px calc(9px + var(--safe-bottom,env(safe-area-inset-bottom,0px)));cursor:pointer}
+nav button.on{color:var(--brass)}
 a{color:var(--brass)}
 </style>
 </head>
 <body>
+<div class="toast" id="toast" hidden></div>
 <header><h1>Finans Takipçisi</h1><span class="st" id="status">bağlanıyor…</span></header>
 <main>
-  <section class="view on" id="v-fav"><div class="sub">Favoriler</div><div id="favList"></div></section>
-  <section class="view" id="v-harem"><div class="sub">Harem Altın</div><div id="haremList"></div></section>
-  <section class="view" id="v-bist"><div class="sub">BIST 100</div><div id="bistList"></div></section>
-  <section class="view" id="v-tcmb"><div class="sub">TCMB</div><div id="tcmbList"></div></section>
-  <section class="view" id="v-kripto"><div class="sub">Kripto</div><div id="kriptoList"></div></section>
+  <section class="view on" id="v-fav">
+    <div class="section">Favoriler</div>
+    <div class="toolrow">
+      <button class="mini" id="favExport">Dışa aktar</button>
+      <button class="mini" id="favImport">İçe aktar</button>
+      <button class="mini" id="favClear">Temizle</button>
+    </div>
+    <div class="io" id="ioBox" hidden>
+      <textarea id="ioText" placeholder="JSON verisi"></textarea>
+      <div class="toolrow"><button class="mini" id="ioCopy">Kopyala</button><button class="mini" id="ioApply">Uygula</button><button class="mini" id="ioClose">Kapat</button></div>
+    </div>
+    <div id="favList"></div>
+  </section>
+
+  <section class="view" id="v-harem">
+    <div class="chips" id="haremChips"></div>
+    <input type="search" id="haremQ" placeholder="Ara: USD, çeyrek, gümüş">
+    <label class="mute" style="font-size:12px"><input type="checkbox" id="hideSus"> Şüpheli spreadli kayıtları gizle</label>
+    <div id="haremList" style="margin-top:10px"></div>
+  </section>
+
+  <section class="view" id="v-bist">
+    <div id="bistIndex"></div>
+    <input type="search" id="bistQ" placeholder="Ara: şirket veya kod">
+    <div class="toolrow">
+      <select id="bistSort">
+        <option value="">Sıralama yok</option><option value="name">Şirket</option><option value="price">Son</option>
+        <option value="high">En Yük.</option><option value="low">En Düş.</option>
+        <option value="value">Hacim</option><option value="changePct">Değişim</option><option value="time">Saat</option>
+      </select>
+      <button class="mini" id="bistDir">▼</button>
+    </div>
+    <div id="bistList"></div>
+  </section>
+
+  <section class="view" id="v-tcmb">
+    <input type="search" id="tcmbQ" placeholder="Ara: USD, euro, altın">
+    <div id="tcmbList"></div>
+  </section>
+
+  <section class="view" id="v-kripto">
+    <div class="kcards" id="kcards"></div>
+    <div class="chips" id="kTabs"></div>
+    <input type="search" id="kQ" placeholder="Ara: BTC, ethereum, sol">
+    <div class="toolrow">
+      <select id="kSort">
+        <option value="">Öntanımlı</option><option value="usd">USD</option><option value="tl">TL</option>
+        <option value="usdPct">24s %</option><option value="volUsd">Hacim</option>
+      </select>
+      <button class="mini" id="kDir">▼</button>
+    </div>
+    <div id="kriptoList"></div>
+  </section>
+
   <section class="view" id="v-ayarlar">
-    <div class="sub">Kaynak durumu</div><div id="sourceList"></div>
-    <div class="sub">Ayarlar</div>
+    <div class="section">Kaynak durumu</div><div id="sourceList"></div>
+    <div class="section">Görünüm ve yenileme</div>
     <div class="setting"><span>Tema</span><select id="theme"><option value="system">Sistem</option><option value="light">Açık</option><option value="dark">Koyu</option></select></div>
-    <div class="sub">Hakkında</div>
+    <div class="setting"><span>Yenileme (sn)</span><input type="number" id="setRefresh" min="2" max="60" step="1" value="5"></div>
+    <div class="setting"><span>Şüpheli spread eşiği (%)</span><input type="number" id="setSpread" min="1" max="50" step="1" value="5"></div>
+    <div class="setting"><span>Varsayılanlar</span><button class="mini" id="setReset">Sıfırla</button></div>
+    <div class="section">Hakkında</div>
     <div class="card">
-      <b>Finans Takipçisi</b> <span class="pill">v1.0.0</span>
+      <b>Finans Takipçisi</b> <span class="mute">v1.0.0</span>
       <p class="mute">Geliştirici: <b>İdris KATAR</b> · MIT Lisansı</p>
       <p>Harem Altın, BIST 100, TCMB ve Kripto piyasaları aynı ekranda izlenir.</p>
-      <p class="mute">Kaynaklar: Harem Socket.IO · Borsa İstanbul / Yahoo Finance · TCMB · Binance · BtcTurk. Veriler bilgilendirme amaçlıdır.</p>
+      <p class="mute">Kaynaklar: Harem Socket.IO · Borsa İstanbul / Yahoo Finance · TCMB · Binance · BtcTurk. Veriler bilgilendirme amaçlıdır, yatırım tavsiyesi değildir.</p>
     </div>
   </section>
 </main>
 <nav id="nav"></nav>
 <script>
-const invoke = window.__TAURI__?.core?.invoke ?? window.__TAURI__?.invoke;
-const $ = id => document.getElementById(id);
-let snap = null, ud = { settings: { theme: "system" }, favorites: [] }, view = "fav";
+(function setSafeArea(){
+  const isAndroid=/Android/i.test(navigator.userAgent);
+  const p=document.createElement("div");
+  p.style.cssText="position:fixed;top:0;left:0;width:0;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none";
+  document.body.append(p);
+  const top=p.getBoundingClientRect().height;
+  p.style.height="env(safe-area-inset-bottom,0px)";
+  const bottom=p.getBoundingClientRect().height;
+  p.remove();
+  document.documentElement.style.setProperty("--safe-top",(top>0?top:(isAndroid?28:0))+"px");
+  document.documentElement.style.setProperty("--safe-bottom",bottom>0?bottom+"px":"0px");
+})();
 
-const VIEWS = [["fav","Favoriler"],["harem","Harem"],["bist","BIST"],["tcmb","TCMB"],["kripto","Kripto"],["ayarlar","Ayarlar"]];
-for (const [k, label] of VIEWS) {
-  const b = document.createElement("button");
-  b.textContent = label; b.dataset.v = k;
-  b.onclick = () => { show(k); };
-  $("nav").append(b);
-}
-function show(k) {
-  view = k;
-  for (const b of $("nav").children) b.classList.toggle("on", b.dataset.v === k);
-  for (const [name] of VIEWS) $("v-" + name).classList.toggle("on", name === k);
-  render();
-}
-function num(v, d = 2) {
-  if (v == null || !isFinite(v)) return "–";
-  return new Intl.NumberFormat("tr-TR", { minimumFractionDigits: d, maximumFractionDigits: d }).format(v);
-}
-function pct(v) { return v == null ? "–" : "%" + num(v, 2); }
-function card(title, code, rows, fav) {
-  const d = document.createElement("div");
-  d.className = "card";
-  const top = document.createElement("div"); top.className = "top";
-  const nm = document.createElement("span"); nm.className = "nm"; nm.textContent = title;
-  const right = document.createElement("span");
-  if (fav) {
-    const b = document.createElement("button");
-    b.className = "star"; b.textContent = ud.favorites.some(f => f.id === fav.id) ? "★" : "☆";
-    b.setAttribute("aria-pressed", String(ud.favorites.some(f => f.id === fav.id)));
-    b.onclick = () => toggleFav(fav.id, fav.source, fav.code, fav.name);
-    right.append(b);
-  }
-  top.append(nm, right);
-  const r = document.createElement("div"); r.className = "row";
-  for (const x of rows) {
-    const s = document.createElement("span");
-    if (x.cls) s.className = x.cls;
-    s.textContent = x.text;
-    r.append(s);
-  }
-  d.append(top, r);
-  if (code) { const c = document.createElement("div"); c.className = "cd"; c.textContent = code; d.append(c); }
-  return d;
-}
-function toggleFav(id, source, code, name) {
-  const i = ud.favorites.findIndex(f => f.id === id);
-  if (i >= 0) ud.favorites.splice(i, 1);
-  else ud.favorites.push({ id, source, code, name });
-  invoke("save_user_data", { body: ud }).catch(() => {});
-  render();
-}
-function empty(box, msg) { box.textContent = ""; const e = document.createElement("div"); e.className = "empty"; e.textContent = msg; box.append(e); }
+const invoke=window.__TAURI__?.core?.invoke??window.__TAURI__?.invoke;
+const $=id=>document.getElementById(id);
+const DEFAULT={theme:"system",refresh:5,spread:5};
+let snap=null,ud={settings:{...DEFAULT},favorites:[]},view="fav";
+let group="all",hq="",hideSus=false,bq="",bSort="",bDir=-1,tq="",kFilter="all",kq="",kSort="",kDir=-1,timer=null;
 
-function render() {
-  if (!snap) return;
-  const h = snap.health || {};
-  $("status").textContent = h.harem?.ok ? "canlı" : h.tcmb?.ok || h.bist?.ok || h.kripto?.ok ? "veri var" : "bekleniyor";
+const VIEWS=[["fav","Favoriler"],["harem","Harem"],["bist","BIST"],["tcmb","TCMB"],["kripto","Kripto"],["ayarlar","Ayarlar"]];
+const GROUPS=[["all","Tümü"],["altin","Altın"],["sarrafiye","Sarrafiye"],["doviz","Döviz"],["parite","Parite"],["maden","Maden"],["diger","Diğer"]];
+const SRC={harem:"Harem Altın",bist:"BIST 100",tcmbToday:"TCMB gösterge",tcmbHourly:"TCMB saat başı",kripto:"Kripto"};
+const FAV_ORDER=["harem","bist","tcmbHourly","tcmbToday","kripto"];
 
-  if (view === "harem") {
-    const box = $("haremList"); box.textContent = "";
-    const list = (snap.prices || []).slice(0, 80);
-    if (!list.length) empty(box, "Harem verisi bekleniyor…");
-    for (const p of list) box.append(card(p.name, p.code, [
-      { text: num(p.buy) + " / " + num(p.sell) },
-      { text: pct(p.spreadPct) },
-    ], { id: "harem:" + p.code, source: "harem", code: p.code, name: p.name }));
-  } else if (view === "bist") {
-    const box = $("bistList"); box.textContent = "";
-    const list = (snap.bist?.items || []).slice(0, 100);
-    if (!list.length) empty(box, "BIST verisi bekleniyor…");
-    for (const p of list) box.append(card(p.name, p.code, [
-      { text: num(p.price) },
-      { text: pct(p.changePct), cls: (p.changePct ?? 0) >= 0 ? "up" : "down" },
-    ], { id: "bist:" + p.code, source: "bist", code: p.code, name: p.name }));
-  } else if (view === "tcmb") {
-    const box = $("tcmbList"); box.textContent = "";
-    const it = snap.tcmb?.today?.items || {};
-    const codes = ["USD", "EUR", "GBP", "CHF"];
-    const rest = Object.keys(it).filter(c => !codes.includes(c));
-    for (const c of [...codes, ...rest]) {
-      const x = it[c]; if (!x) continue;
-      box.append(card(x.name, c, [{ text: num(x.buy, 4) }],
-        { id: "tcmbToday:" + c, source: "tcmbToday", code: c, name: x.name }));
-    }
-    if (!box.children.length) empty(box, "TCMB verisi bekleniyor…");
-  } else if (view === "kripto") {
-    const box = $("kriptoList"); box.textContent = "";
-    for (const x of (snap.kripto?.items || [])) {
-      box.append(card(x.name, x.code, [
-        { text: x.usd == null ? "–" : "$" + num(x.usd, 4) },
-        { text: x.tl == null ? "–" : num(x.tl, 2) + " ₺" },
-        { text: pct(x.usdPct), cls: (x.usdPct ?? 0) >= 0 ? "up" : "down" },
-      ], { id: "kripto:" + x.code, source: "kripto", code: x.code, name: x.name }));
-    }
-    if (!box.children.length) empty(box, "Kripto verisi bekleniyor…");
-  } else if (view === "fav") {
-    const box = $("favList"); box.textContent = "";
-    if (!ud.favorites.length) { empty(box, "Henüz favori yok. Listelerdeki yıldıza dokunun."); return; }
-    for (const f of ud.favorites) {
-      const key = f.source === "harem" ? "code" : "code";
-      let x = null, value = "–";
-      if (f.source === "harem") x = (snap.prices || []).find(p => p.code === f.code);
-      else if (f.source === "bist") x = (snap.bist?.items || []).find(p => p.code === f.code);
-      else if (f.source === "tcmbToday") x = snap.tcmb?.today?.items?.[f.code];
-      else if (f.source === "tcmbHourly") x = snap.tcmb?.hourly?.items?.[f.code];
-      else if (f.source === "kripto") x = (snap.kripto?.items || []).find(p => p.code === f.code);
-      if (x) value = f.source === "kripto" ? "$" + num(x.usd, 4) : f.source === "bist" ? num(x.price) : num(x.buy ?? x.sell, 4);
-      box.append(card(f.name || f.code, f.source, [{ text: value }],
-        { id: f.id, source: f.source, code: f.code, name: f.name }));
-    }
-  } else if (view === "ayarlar") {
-    const box = $("sourceList"); box.textContent = "";
-    const labels = { harem: "Harem Altın", tcmb: "TCMB", bist: "BIST 100", kripto: "Kripto" };
-    for (const [k, label] of Object.entries(labels)) {
-      const s = h[k] || {};
-      const st = !s.ok ? "err" : s.from_cache ? "cached" : "ok";
-      const d = document.createElement("div"); d.className = "setting";
-      d.innerHTML = '<span><span class="dot ' + st + '"></span>' + label + '</span><span class="mute">' +
-        (s.last_data_at ? new Date(s.last_data_at).toLocaleTimeString("tr-TR") : "veri yok") + '</span>';
-      box.append(d);
-    }
-  }
-}
+for(const [k,label] of VIEWS){const b=document.createElement("button");b.textContent=label;b.dataset.v=k;b.onclick=()=>show(k);$("nav").append(b)}
+for(const [k,label] of GROUPS){const b=document.createElement("button");b.textContent=label;b.dataset.g=k;b.onclick=()=>{group=k;renderChips();renderHarem()};$("haremChips").append(b)}
+for(const [k,label] of [["all","Tümü"],["up","Yükselenler"],["down","Düşenler"],["vol","Hacim"]]){const b=document.createElement("button");b.textContent=label;b.dataset.k=k;b.onclick=()=>{kFilter=k;kSort="";renderKTabs();renderKripto()};$("kTabs").append(b)}
 
-async function refresh() {
-  try {
-    snap = await invoke("snapshot");
-    render();
-  } catch (e) { $("status").textContent = "bağlantı hatası"; }
-}
-async function init() {
-  try {
-    ud = await invoke("get_user_data");
-    if (!ud || !Array.isArray(ud.favorites)) ud = { settings: { theme: "system" }, favorites: [] };
-  } catch {}
-  const t = ud.settings?.theme || "system";
-  if (t === "system") delete document.documentElement.dataset.theme;
-  else document.documentElement.dataset.theme = t;
-  $("theme").value = t;
-  $("theme").onchange = async e => {
-    const th = e.target.value;
-    if (th === "system") delete document.documentElement.dataset.theme;
-    else document.documentElement.dataset.theme = th;
-    ud.settings.theme = th;
-    await invoke("save_user_data", { body: ud });
-  };
-  show("fav");
-  await refresh();
-  setInterval(refresh, 5000);
-}
-init();
+function show(k){view=k;for(const b of $("nav").children)b.classList.toggle("on",b.dataset.v===k);for(const [n] of VIEWS)$("v-"+n).classList.toggle("on",n===k);render()}
+function renderChips(){for(const b of $("haremChips").children)b.classList.toggle("on",b.dataset.g===group)}
+function renderKTabs(){for(const b of $("kTabs").children)b.classList.toggle("on",b.dataset.k===kFilter)}
+function n2(v,d=2){if(v==null||!isFinite(v))return "–";return new Intl.NumberFormat("tr-TR",{minimumFractionDigits:d,maximumFractionDigits:d}).format(v)}
+function pct(v){return v==null?"–":(v>0?"+":"")+n2(v,2)+"%"}
+function cls(v){return v==null?"":v>=0?"up":"down"}
+function coin(v){if(v==null||!isFinite(v))return "–";const a=Math.abs(v),d=a>=1000?2:a>=1?3:a>=0.1?4:a>=0.01?5:a>=0.001?6:8;return new Intl.NumberFormat("tr-TR",{maximumFractionDigits:d}).format(v)}
+function compact(v){if(v==null||!isFinite(v))return "–";const a=Math.abs(v);if(a>=1e9)return n2(v/1e9,2)+" mlr";if(a>=1e6)return n2(v/1e6,2)+" mn";if(a>=1e3)return n2(v/1e3,1)+" bin";return n2(v,1)}
+function fold(s){return String(s??"").toLocaleLowerCase("tr").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ı/g,"i")}
+function text(tag,cls,t){const e=document.createElement(tag);if(cls)e.className=cls;if(t!=null)e.textContent=t;return e}
+
+function toast(msg){const t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,7000)}
+function persist(){invoke("save_user_data",{body:ud}).catch(()=>{})}
+function isFav(id){return ud.favorites.some(f=>f.id===id)}
+function toggleFav(id,source,code,name){const i=ud.favorites.findIndex(f=>f.id===id);if(i>=0)ud.favorites.splice(i,1);else ud.favorites.push({id,source,code,name});persist();render()}
+function favStar(id,source,code,name){const b=text("button","star",isFav(id)?"★":"☆");b.title=isFav(id)?"Favorilerden çıkar":"Favorilere ekle";b.setAttribute("aria-pressed",String(isFav(id)));b.onclick=()=>toggleFav(id,source,code,name);return b}
+function card(title,code,rows,sub,star){const d=text("div","card");const top=text("div","top");const nm=text("div","nm",title);if(code){const c=text("span","cd",code);nm.append(c)}top.append(nm);if(star)top.append(star);d.append(top);const r=text("div","row");for(const x of rows){const s=text("span",x.cls??"",x.text);r.append(s)}d.append(r);if(sub){for(const s of sub)d.append(s)}return d}
+function details(pairs){if(!pairs.length)return null;const d=document.createElement("details");d.append(text("summary",null,"detaylar"));const g=text("div","kv");for(const [k,v] of pairs){g.append(text("span",null,k),text("span",null,v))}d.append(g);return d}
+function empty(box,msg){box.textContent="";box.append(text("div","empty",msg))}
+function suspect(s,spread){return s!=null&&(s<0||s>spread)}
+function timeText(iso){if(!iso)return "–";const d=new Date(iso);return isNaN(d)? "–" : d.toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})}
+
+function checkAlarm(f,current){const a=f.alarm;if(!a||current==null||!Number.isFinite(Number(a.price)))return;const p=Number(a.price);if(p<=0)return;const hit=a.dir==="above"?current>=p:current<=p;if(!hit)return;const last=a.triggeredAt?Date.parse(a.triggeredAt):0;if(Date.now()-last<5*60_000)return;a.triggeredAt=new Date().toISOString();persist();toast("Alarm · "+(a.dir==="above"?"≥ ":"≤ ")+coin(p)+" — "+(f.name||f.code)+" "+coin(current))}
+function alarmControl(f,current){const row=text("div","alarmrow");const dir=document.createElement("select");for(const [v,l] of [["above","↑ üstü"],["below","↓ altı"]]){const o=text("option",null,l);o.value=v;if((f.alarm?.dir??"above")===v)o.selected=true;dir.append(o)}const inp=document.createElement("input");inp.type="number";inp.step="any";inp.placeholder="eşik fiyat";inp.value=f.alarm?.price??"";const btn=text("button","mini",f.alarm?"✓":"+");btn.onclick=()=>{const p=Number(inp.value);if(!f.alarm&&(!Number.isFinite(p)||p<=0)){toast("Geçerli bir eşik girin.");return}f.alarm=f.alarm?undefined:{dir:dir.value,price:p,active:true};persist();render();toast(f.alarm?"Alarm kuruldu.":"Alarm kaldırıldı.")};row.append(dir,inp,btn);return row}
+function favValue(f){let x=null;if(f.source==="harem")x=(snap.prices||[]).find(p=>p.code===f.code);else if(f.source==="bist")x=(snap.bist?.items||[]).find(p=>p.code===f.code);else if(f.source==="tcmbToday")x=snap.tcmb?.today?.items?.[f.code];else if(f.source==="tcmbHourly")x=snap.tcmb?.hourly?.items?.[f.code];else if(f.source==="kripto")x=(snap.kripto?.items||[]).find(p=>p.code===f.code);if(!x)return{x:null,value:"–",current:null,pct:null,time:"–"};let value,current,p=null,t="–";if(f.source==="harem"){current=x.sell??x.buy;value=n2(x.buy)+" / "+n2(x.sell);p=x.spreadPct;t=timeText(x.updatedAt)}else if(f.source==="bist"){current=x.price;value=n2(x.price);p=x.changePct;t=timeText(x.time)}else if(f.source==="kripto"){current=x.usd;value="$"+coin(x.usd)+(x.tl!=null?" · "+coin(x.tl)+" ₺"+(x.estimated?" ≈":""):"");p=x.usdPct;t=timeText(x.time)}else{current=x.buy;value=n2(x.buy,4)+(x.unit>1?" / "+x.unit+" birim":"");t="–"}return{x,value,current,pct:p,time:t}}
+
+function renderFav(){const box=$("favList");box.textContent="";if(!ud.favorites.length){empty(box,"Henüz favori yok. Listelerdeki yıldıza dokunun.");return}const list=[...ud.favorites].sort((a,b)=>FAV_ORDER.indexOf(a.source)-FAV_ORDER.indexOf(b.source)||(a.name||a.code).localeCompare(b.name||b.code,"tr"));for(const f of list){const {value,current,pct:p,time}=favValue(f);checkAlarm(f,current);const c=card(f.name||f.code,SRC[f.source]??f.source,[{text:value},{text:pct(p),cls:cls(p)}],[text("div","sub","Güncelleme: "+time),alarmControl(f,current)],favStar(f.id,f.source,f.code,f.name||f.code));box.append(c)}}
+
+function renderHarem(){const box=$("haremList");box.textContent="";const spread=ud.settings.spread??5;let list=(snap.prices||[]).filter(p=>(group==="all"||p.group===group)&&(!hq||fold(p.code).includes(hq)||fold(p.name).includes(hq))&&!(hideSus&&suspect(p.spreadPct,spread)));let last=null;for(const p of list){if(group==="all"&&p.group!==last){last=p.group;box.append(text("div","section",({altin:"Altın",sarrafiye:"Sarrafiye",doviz:"Döviz",parite:"Parite",maden:"Maden",diger:"Diğer"})[p.group]??p.group))}const rows=[{text:n2(p.buy)+" ₺"},{text:n2(p.sell)+" ₺"}];const sub=[{suspect:suspect(p.spreadPct,spread),text:p.spreadPct<0?"Ters spread":suspect(p.spreadPct,spread)?"Geniş spread":null}];const d=details([["Spread",pct(p.spreadPct)],["Düşük / yüksek",n2(p.low)+" / "+n2(p.high)],["Önceki kapanış",n2(p.prevClose)]]);const c=card(p.name,p.code,rows,sub,favStar("harem:"+p.code,"harem",p.code,p.name));if(d)c.append(d);box.append(c)}if(!box.children.length)empty(box,"Kayıt yok.")}
+
+function renderBist(){const box=$("bistList");box.textContent="";const idx=snap.bist?.indexQuote;const ib=$("bistIndex");ib.textContent="";if(idx){const c=card("BIST 100 · XU100",null,[{text:n2(idx.price)},{text:pct(idx.changePct),cls:cls(idx.changePct)}],[text("div","sub",(snap.bist?.date??"")+(snap.bist?.marketOpen===false?" · piyasa kapalı":""))]);ib.append(c)}let list=(snap.bist?.items??[]).filter(x=>!bq||fold(x.code).includes(bq)||fold(x.name).includes(bq)||fold(x.longName).includes(bq));if(bSort){const key=bSort;list=[...list].sort((a,b)=>{const av=a[key],bv=b[key];const an=Number(av),bn=Number(bv);let r=0;if(isFinite(an)&&isFinite(bn))r=an-bn;else r=String(av??"").localeCompare(String(bv??""),"tr");return r*bDir})}for(const x of list){const d=details([["En yük.",n2(x.high)],["En düş.",n2(x.low)],["Hacim",(x.value==null?"–":"₺"+n2(x.value))+(x.volume!=null?" (~"+n2(x.volume,0)+" adet)":"")],["Saat",timeText(x.time)]]);const c=card(x.name,x.code,[{text:n2(x.price)},{text:pct(x.changePct),cls:cls(x.changePct)}],[],favStar("bist:"+x.code,"bist",x.code,x.name));if(d)c.append(d);box.append(c)}if(!box.children.length)empty(box,"BIST verisi bekleniyor…")}
+
+function renderTcmb(){const box=$("tcmbList");box.textContent="";const t=snap.tcmb??{};const match=x=>!tq||fold(x.code).includes(tq)||fold(x.name).includes(tq);const hourly=Object.values(t.hourly?.items??{}).filter(match);const today=Object.values(t.today?.items??{}).filter(match);const first=["USD","EUR","CHF","GBP"];const rank=c=>{const i=first.indexOf(c);return i===-1?99:i};const sortRows=rows=>[...rows].sort((a,b)=>rank(a.code)-rank(b.code)||a.code.localeCompare(b.code,"tr"));if(hourly.length){box.append(text("div","section","Saat başı kur ve altın · "+(t.hourly?.time??"")));for(const x of sortRows(hourly)){const d=details([["Birim",String(x.unit??1)],["Kaynak","TCMB saat başı (yalnız alış)"]]);const c=card(x.name,x.code,[{text:n2(x.buy,4)+" ₺"}],[],favStar("tcmbHourly:"+x.code,"tcmbHourly",x.code,x.name));if(d)c.append(d);box.append(c)}}if(today.length){box.append(text("div","section","Gösterge kurları · "+(t.today?.date??"")+(t.today?.bulten?" · bülten "+t.today.bulten:"")));for(const x of sortRows(today)){const d=details([["Birim",String(x.unit??1)],["Döviz satış",n2(x.sell,4)],["Nakit alış",n2(x.cashBuy,4)],["Nakit satış",n2(x.cashSell,4)]]);const c=card(x.name,x.code,[{text:n2(x.buy,4)+" ₺"}],[],favStar("tcmbToday:"+x.code,"tcmbToday",x.code,x.name));if(d)c.append(d);box.append(c)}}if(!box.children.length)empty(box,"TCMB verisi bekleniyor…")}
+
+function renderKCards(){const box=$("kcards");box.textContent="";const list=snap.kripto?.items??[];const by=Object.fromEntries(list.map(x=>[x.code,x]));const kv=(lb,x)=>{const d=text("div","kpi");d.append(text("div","lb",lb),text("div","v",x?("$"+coin(x.usd)):"–"),text("div","s "+(x?(x.usdPct>=0?"up":"down"):""),x?(coin(x.tl)+" ₺ · "+pct(x.usdPct)):"veri yok"));return d};box.append(kv("BTC",by.BTC),kv("ETH",by.ETH));const usdt=snap.kripto?.meta?.usdtTry,tcmbUsd=snap.tcmb?.hourly?.items?.USD?.buy;const diff=usdt!=null&&tcmbUsd?(usdt/tcmbUsd-1)*100:null;const d=text("div","kpi");d.append(text("div","lb","Kripto dolar"),text("div","v",usdt==null?"–":coin(usdt)+" ₺"),text("div","s",tcmbUsd==null?"TCMB kuru bekleniyor":"TCMB "+n2(tcmbUsd,4)+" · "+pct(diff)));box.append(d);const best=[...list].filter(x=>x.usdPct!=null).sort((a,b)=>b.usdPct-a.usdPct)[0];const e=text("div","kpi");e.append(text("div","lb","24s en çok yükselen"),text("div","v",best?best.code+" "+pct(best.usdPct):"–"),text("div","s",best&&best.usd!=null?"$"+coin(best.usd):""));box.append(e)}
+
+function renderKripto(){const box=$("kriptoList");box.textContent="";renderKCards();let list=snap.kripto?.items??[];if(kFilter==="up")list=list.filter(x=>x.usdPct>0);else if(kFilter==="down")list=list.filter(x=>x.usdPct<0);if(kq)list=list.filter(x=>fold(x.code).includes(kq)||fold(x.name).includes(kq));const preset=kFilter==="vol"?"volUsd":(kFilter==="up"||kFilter==="down")?"usdPct":null;const key=kSort||preset;if(key)list=[...list].sort((a,b)=>{const av=a[key],bv=b[key];if(av==null&&bv==null)return a.code.localeCompare(b.code);if(av==null)return 1;if(bv==null)return -1;return(av-bv)*(kSort?kDir:(kFilter==="down"?1:-1))||a.code.localeCompare(b.code)});for(const x of list){const rows=[{text:x.usd==null?"–":"$"+coin(x.usd)},{text:x.tl==null?"–":coin(x.tl)+" ₺"+(x.estimated?" ≈":"")},{text:pct(x.usdPct),cls:cls(x.usdPct)}];const sub=[];if(x.tl!=null&&x.tlHigh!=null&&x.tlLow!=null&&x.tlHigh>x.tlLow){const r=text("div","rng");const i=document.createElement("i");i.style.left=Math.min(100,Math.max(0,((x.tl-x.tlLow)/(x.tlHigh-x.tlLow))*100))+"%";r.append(i);r.title="24s aralık: "+coin(x.tlLow)+" – "+coin(x.tlHigh)+" ₺";sub.push(r)}const d=details([["24s yüksek / düşük (TL)",coin(x.tlHigh)+" / "+coin(x.tlLow)],["Hacim (USD)",x.volUsd==null?"–":"$"+compact(x.volUsd)],["Hacim (TL)",x.volTl==null?"–":(x.volTlApprox?"≈":"")+compact(x.volTl)+" ₺"],["Saat",timeText(x.time)],["Kaynak",(x.usdSrc??"–")+" / "+(x.tlSrc??"–")]]);const c=card(x.name,x.code,rows,sub,favStar("kripto:"+x.code,"kripto",x.code,x.name));if(d)c.append(d);box.append(c)}if(!box.children.length)empty(box,"Kripto verisi bekleniyor…")}
+
+function renderSourceHealth(){const box=$("sourceList");box.textContent="";const HEALTH={harem:"Harem Altın",tcmb:"TCMB",bist:"BIST 100",kripto:"Kripto"};for(const [k,label] of Object.entries(HEALTH)){const s=snap?.health?.[k]??{};const st=!s.ok?"err":s.from_cache?"cached":"ok";const d=text("div","setting");const l=text("span");const dot=text("span","dot "+st);l.append(dot,document.createTextNode(label));const info=text("span","mute",s.last_data_at?timeText(s.last_data_at)+(s.error?" · "+s.error:""):(s.error??(s.ok?"canlı":"veri yok")));d.append(l,info);box.append(d)}}
+
+function render(){if(!snap)return;const h=snap.health||{};$("status").textContent=h.harem?.ok?"canlı":(h.tcmb?.ok||h.bist?.ok||h.kripto?.ok)?"veri var":"bekleniyor";if(view==="fav")renderFav();else if(view==="harem")renderHarem();else if(view==="bist")renderBist();else if(view==="tcmb")renderTcmb();else if(view==="kripto")renderKripto();else if(view==="ayarlar")renderSourceHealth()}
+async function refresh(){try{snap=await invoke("snapshot");render()}catch{$("status").textContent="bağlantı hatası"}}
+function restartTimer(){if(timer)clearInterval(timer);timer=setInterval(refresh,(ud.settings.refresh||5)*1000)}
+
+$("hideSus").onchange=e=>{hideSus=e.target.checked;renderHarem()};
+$("haremQ").oninput=e=>{hq=fold(e.target.value.trim());renderHarem()};
+$("bistQ").oninput=e=>{bq=fold(e.target.value.trim());renderBist()};
+$("tcmbQ").oninput=e=>{tq=fold(e.target.value.trim());renderTcmb()};
+$("kQ").oninput=e=>{kq=fold(e.target.value.trim());renderKripto()};
+$("bistSort").onchange=e=>{bSort=e.target.value;renderBist()};
+$("bistDir").onclick=()=>{bDir=-bDir;$("bistDir").textContent=bDir>0?"▲":"▼";renderBist()};
+$("kSort").onchange=e=>{kSort=e.target.value;renderKripto()};
+$("kDir").onclick=()=>{kDir=-kDir;$("kDir").textContent=kDir>0?"▲":"▼";renderKripto()};
+
+function ioOpen(mode){$("ioBox").hidden=false;$("ioText").value=mode==="export"?JSON.stringify({app:"Finans Takipçisi",version:1,exportedAt:new Date().toISOString(),settings:ud.settings,favorites:ud.favorites},null,2):"";$("ioText").dataset.mode=mode}
+$("favExport").onclick=()=>ioOpen("export");
+$("favImport").onclick=()=>ioOpen("import");
+$("ioClose").onclick=()=>{$("ioBox").hidden=true};
+$("ioCopy").onclick=async()=>{try{await navigator.clipboard.writeText($("ioText").value);toast("Panoya kopyalandı.")}catch{toast("Kopyalanamadı, metni seçip kopyalayın.")}};
+$("ioApply").onclick=()=>{try{const d=JSON.parse($("ioText").value);if(!Array.isArray(d.favorites))throw new Error("geçersiz dosya");let n=0;for(const f of d.favorites){if(f&&typeof f.id==="string"&&SRC[f.source]){const i=ud.favorites.findIndex(x=>x.id===f.id);const item={id:f.id,source:f.source,code:f.code,name:f.name??f.code,alarm:f.alarm};if(i>=0)ud.favorites[i]=item;else ud.favorites.push(item);n++}}if(d.settings)ud.settings={...DEFAULT,...d.settings};persist();applySettings();render();$("ioBox").hidden=true;toast(n+" favori içe aktarıldı.")}catch(e){toast("İçe aktarma hatası: "+e.message)}};
+$("favClear").onclick=()=>{if(!ud.favorites.length)return;ud.favorites=[];persist();render();toast("Favoriler temizlendi.")};
+
+function applySettings(){const t=ud.settings.theme||"system";if(t==="system")delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=t;$("theme").value=t;$("setRefresh").value=ud.settings.refresh||5;$("setSpread").value=ud.settings.spread||5;restartTimer()}
+$("theme").onchange=e=>{ud.settings.theme=e.target.value;applySettings();persist()};
+$("setRefresh").onchange=e=>{ud.settings.refresh=Math.max(2,Number(e.target.value)||5);applySettings();persist()};
+$("setSpread").onchange=e=>{ud.settings.spread=Math.max(1,Number(e.target.value)||5);applySettings();persist();render()};
+$("setReset").onclick=()=>{ud.settings={...DEFAULT};applySettings();persist();render();toast("Varsayılan ayarlar geri yüklendi.")};
+
+(async function init(){
+  try{ud=await invoke("get_user_data");if(!ud||!Array.isArray(ud.favorites))ud={settings:{...DEFAULT},favorites:[]};ud.settings={...DEFAULT,...(ud.settings||{})}}catch{}
+  renderChips();renderKTabs();applySettings();show("fav");await refresh();
+})();
 </script>
 </body>
 </html>
