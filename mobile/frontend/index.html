@@ -55,7 +55,6 @@ details .kv span:nth-child(odd){color:var(--mute)}
 .alarmrow{display:flex;gap:6px;align-items:center;margin-top:7px}
 .alarmrow input{width:88px}
 .toast{position:fixed;left:14px;right:14px;bottom:calc(82px + var(--safe-bottom,0px));z-index:50;background:var(--panel);border:1px solid var(--brass);border-left:4px solid var(--brass);border-radius:9px;padding:11px 13px;box-shadow:0 8px 24px rgba(0,0,0,.3);font-size:13px}
-.fav-actions{position:sticky;bottom:calc(58px + var(--safe-bottom,0px));z-index:15;justify-content:center;background:var(--bg);padding:8px 0;margin-top:14px;border-radius:9px}
 nav{position:fixed;bottom:0;left:0;right:0;z-index:20;background:var(--panel);border-top:1px solid var(--line);display:flex;overflow-x:auto}
 nav button{flex:1;min-width:58px;border:0;background:none;color:var(--mute);font:600 10.5px system-ui;padding:9px 3px calc(9px + var(--safe-bottom,env(safe-area-inset-bottom,0px)));cursor:pointer}
 nav button.on{color:var(--brass)}
@@ -69,11 +68,6 @@ a{color:var(--brass)}
   <section class="view on" id="v-fav">
     <div class="section">Favoriler</div>
     <div id="favList"></div>
-    <div class="toolrow fav-actions">
-      <button class="ghost" id="favExport">Dışa aktar</button>
-      <button class="ghost" id="favImport">İçe aktar</button>
-      <button class="ghost" id="favClear">Temizle</button>
-    </div>
   </section>
 
   <section class="view" id="v-harem">
@@ -215,43 +209,6 @@ $("bistSort").onchange=e=>{bSort=e.target.value;renderBist()};
 $("bistDir").onclick=()=>{bDir=-bDir;$("bistDir").textContent=bDir>0?"▲":"▼";renderBist()};
 $("kSort").onchange=e=>{kSort=e.target.value;renderKripto()};
 $("kDir").onclick=()=>{kDir=-kDir;$("kDir").textContent=kDir>0?"▲":"▼";renderKripto()};
-
-const JSON_FILTER=[{name:"JSON dosyası",extensions:["json"]}];
-$("favExport").onclick=async()=>{
-  try{
-    const dialog=window.__TAURI__?.dialog;
-    if(!dialog){toast("Dosya seçici kullanılamıyor.");return}
-    const path=await dialog.save({defaultPath:"finans-takipcisi-favoriler.json",filters:JSON_FILTER});
-    if(!path)return;
-    const payload={app:"Finans Takipçisi",version:1,exportedAt:new Date().toISOString(),settings:ud.settings,favorites:ud.favorites};
-    await invoke("write_json_file",{path,contents:JSON.stringify(payload,null,2)});
-    toast("Favoriler JSON dosyasına kaydedildi.");
-  }catch(e){toast("Dışa aktarma hatası: "+e)}
-};
-$("favImport").onclick=async()=>{
-  try{
-    const dialog=window.__TAURI__?.dialog;
-    if(!dialog){toast("Dosya seçici kullanılamıyor.");return}
-    const selected=await dialog.open({multiple:false,filters:JSON_FILTER});
-    if(!selected)return;
-    const text=await invoke("read_json_file",{path:String(selected)});
-    const d=JSON.parse(text);
-    if(!Array.isArray(d.favorites))throw new Error("geçersiz dosya biçimi");
-    let n=0;
-    for(const f of d.favorites){
-      if(f&&typeof f.id==="string"&&SRC[f.source]){
-        const item={id:f.id,source:f.source,code:f.code,name:f.name??f.code,alarm:f.alarm};
-        const i=ud.favorites.findIndex(x=>x.id===f.id);
-        if(i>=0)ud.favorites[i]=item;else ud.favorites.push(item);
-        n++;
-      }
-    }
-    if(d.settings)ud.settings={...DEFAULT,...d.settings};
-    persist();applySettings();render();
-    toast(n+" favori içe aktarıldı.");
-  }catch(e){toast("İçe aktarma hatası: "+e)}
-};
-$("favClear").onclick=()=>{if(!ud.favorites.length)return;ud.favorites=[];persist();render();toast("Favoriler temizlendi.")};
 
 function applySettings(){const t=ud.settings.theme||"system";if(t==="system")delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=t;$("theme").value=t;$("setRefresh").value=ud.settings.refresh||5;$("setSpread").value=ud.settings.spread||5;restartTimer()}
 $("theme").onchange=e=>{ud.settings.theme=e.target.value;applySettings();persist()};

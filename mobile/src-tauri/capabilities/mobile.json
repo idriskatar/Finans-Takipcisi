@@ -3,5 +3,5 @@
   "identifier": "mobile-default",
   "description": "Mobil finans takipçisi izinleri",
   "windows": ["main"],
-  "permissions": ["core:default", "dialog:default"]
+  "permissions": ["core:default"]
 }

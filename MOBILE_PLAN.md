@@ -23,8 +23,8 @@ Finance/
 - ✅ Mobil arayüz: 6 sekme (Favoriler/Harem/BIST/TCMB/Kripto/Ayarlar) ve masaüstüyle
   **özellik eşitliği**: kategori sekmeleri + arama + şüpheli filtresi (Harem), BIST sıralama
   ve endeks kartı, TCMB saat başı + gösterge + birim/nakit kurlar, kripto özet kartları +
-  alt sekmeler + arama + sıralama + 24s aralık çubuğu + hacim, favorilerde **fiyat alarmı**
-  ve JSON dışa/içe aktarım, tema + yenileme aralığı + spread eşiği ayarları, kaynak durumu,
+  alt sekmeler + arama + sıralama + 24s aralık çubuğu + hacim, favorilerde **fiyat alarmı**,
+  tema + yenileme aralığı + spread eşiği ayarları, kaynak durumu,
   Hakkında (İdris KATAR + veri kaynakları + MIT). Tüm detaylar genişletilebilir kartlarda.
 - ✅ Android/iOS ikon seti üretildi (`cargo tauri icon ../icon-1024.png`).
 
@@ -118,11 +118,9 @@ olarak ekleyip workflow'da env olarak vermeniz gerekir.
 4. Durum çubuğu: `viewport-fit=cover` + `env(safe-area-inset-top/bottom)` ölçümüyle
    başlık ve alt navigasyon Android bildirim ikonları / gesture bar ile çakışmaz
    (`--safe-top` / `--safe-bottom`; env 0 döndürürse Android için 28px yedek).
-5. Favori aktarımı: **Dışa aktar / İçe aktar / Temizle** düğmeleri listenin **altında**;
-   metin alanı yerine `tauri-plugin-dialog` ile yerel JSON dosyası seçilir. Yeni invoke
-   komutları: `read_json_file`, `write_json_file` (yalnızca `.json` kabul edilir).
 4. UI polishing: pull-to-refresh, büyük dokunma alanları, güncelleme animasyonu.
-5. Favori aktarımı ve fiyat alarmı: masaüstündeki mantık `core`'a taşınabilir / mobil UI'a eklenebilir.
+5. Favorilerde tek tek silme düğmesi (şu an yıldızla kaldırılıyor). Dosya aktarımı mobilde
+   kaldırıldı; kullanıcı geri bildirimi üzerine düğmeler iptal edildi.
 
 ## Lisans / kimlik
 
