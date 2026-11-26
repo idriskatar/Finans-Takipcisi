@@ -13,9 +13,11 @@ Repo → **Settings → Secrets and variables → Actions → New repository sec
 | Secret | Değer |
 |---|---|
 | `TAURI_SIGNING_PRIVATE_KEY` | Görüşmede paylaşılan özel anahtar (uzun base64 metin) |
-| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | `finans-takipcisi` |
+| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | `finans` |
 
 > Özel anahtar **asla** depoya eklenmez. Zip içinde de yoktur.
+> Daha önce eklediyseniz **eski `TAURI_SIGNING_PRIVATE_KEY` secret'ını yeni değerle
+> güncelleyin** ve şifreyi `finans` yapın. Eski anahtar base64 çözümleme hatası veriyordu.
 
 Genel anahtar `desktop/src-tauri/tauri.conf.json` içinde zaten tanımlı; değiştirmeyin.
 

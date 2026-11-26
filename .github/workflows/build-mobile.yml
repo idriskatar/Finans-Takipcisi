@@ -10,6 +10,8 @@ jobs:
   android:
     name: Android (APK + AAB)
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Kaynak kod
         uses: actions/checkout@v4
@@ -73,7 +75,8 @@ jobs:
           BT=$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -n 1)
           ALIGNED="$RUNNER_TEMP/aligned.apk"
           "$ANDROID_HOME/build-tools/$BT/zipalign" -f -p 4 "$UNSIGNED" "$ALIGNED"
-          OUT="mobile/src-tauri/gen/android/app/build/outputs/Finans-Takipcisi-1.0.0-debug-signed.apk"
+          VER="${GITHUB_REF_NAME#v}"
+          OUT="mobile/src-tauri/gen/android/app/build/outputs/Finans-Takipcisi-${VER}-debug-signed.apk"
           "$ANDROID_HOME/build-tools/$BT/apksigner" sign \
             --ks "$KEYSTORE" --ks-key-alias androiddebugkey \
             --ks-pass pass:android --key-pass pass:android \
@@ -85,8 +88,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-install-apk
-          path: mobile/src-tauri/gen/android/app/build/outputs/Finans-Takipcisi-1.0.0-debug-signed.apk
+          path: mobile/src-tauri/gen/android/app/build/outputs/*-debug-signed.apk
           if-no-files-found: error
+
+      - name: APK'yi GitHub Release'e ekle
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: mobile/src-tauri/gen/android/app/build/outputs/*-debug-signed.apk
 
   ios:
     name: iOS (simulator .app, imzasız)

@@ -56,7 +56,7 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: finans-takipcisi
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: finans
         with:
           projectPath: desktop/src-tauri
           args: ${{ matrix.args }}
