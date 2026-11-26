@@ -55,6 +55,7 @@ details .kv span:nth-child(odd){color:var(--mute)}
 .alarmrow{display:flex;gap:6px;align-items:center;margin-top:7px}
 .alarmrow input{width:88px}
 .toast{position:fixed;left:14px;right:14px;bottom:calc(82px + var(--safe-bottom,0px));z-index:50;background:var(--panel);border:1px solid var(--brass);border-left:4px solid var(--brass);border-radius:9px;padding:11px 13px;box-shadow:0 8px 24px rgba(0,0,0,.3);font-size:13px}
+.fav-actions{position:sticky;bottom:calc(58px + var(--safe-bottom,0px));z-index:15;justify-content:center;background:var(--bg);padding:8px 0;margin-top:14px;border-radius:9px}
 nav{position:fixed;bottom:0;left:0;right:0;z-index:20;background:var(--panel);border-top:1px solid var(--line);display:flex;overflow-x:auto}
 nav button{flex:1;min-width:58px;border:0;background:none;color:var(--mute);font:600 10.5px system-ui;padding:9px 3px calc(9px + var(--safe-bottom,env(safe-area-inset-bottom,0px)));cursor:pointer}
 nav button.on{color:var(--brass)}
@@ -68,7 +69,7 @@ a{color:var(--brass)}
   <section class="view on" id="v-fav">
     <div class="section">Favoriler</div>
     <div id="favList"></div>
-    <div class="toolrow" style="margin:16px 0 8px;justify-content:center">
+    <div class="toolrow fav-actions">
       <button class="ghost" id="favExport">Dışa aktar</button>
       <button class="ghost" id="favImport">İçe aktar</button>
       <button class="ghost" id="favClear">Temizle</button>
