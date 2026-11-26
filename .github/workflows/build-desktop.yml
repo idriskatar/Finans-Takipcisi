@@ -54,6 +54,9 @@ jobs:
       # araması yapılmaz ("No artifacts were found" hatası ortaya çıkmaz).
       - name: Derle
         uses: tauri-apps/tauri-action@v0
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: finans-takipcisi
         with:
           projectPath: desktop/src-tauri
           args: ${{ matrix.args }}
@@ -79,12 +82,18 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Kaynak kod (script için)
+        uses: actions/checkout@v4
+
       - name: Artifact'leri indir
         uses: actions/download-artifact@v4
         with:
           pattern: desktop-*
           path: artifacts
           merge-multiple: true
+
+      - name: latest.json üret (updater)
+        run: node scripts/generate-latest.mjs artifacts "${GITHUB_REF_NAME#v}" "${GITHUB_REF_NAME}"
 
       - name: Taslak sürüm oluştur ve paketleri ekle
         uses: softprops/action-gh-release@v2

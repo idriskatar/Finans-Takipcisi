@@ -121,6 +121,10 @@ olarak ekleyip workflow'da env olarak vermeniz gerekir.
 4. UI polishing: pull-to-refresh, büyük dokunma alanları, güncelleme animasyonu.
 5. Favorilerde tek tek silme düğmesi (şu an yıldızla kaldırılıyor). Dosya aktarımı mobilde
    kaldırıldı; kullanıcı geri bildirimi üzerine düğmeler iptal edildi.
+6. **Güncelleme:** `check_update` GitHub Releases API'sini kontrol eder, yeni sürümde
+   üstte indirme şeridi gösterilir; `open_url` APK'yı tarayıcıda açar. Sessiz kurulum
+   için native Android FileProvider + `REQUEST_INSTALL_PACKAGES` köprüsü gerekir.
+   Ayrıntılar: `UPDATE_SETUP.md`.
 
 ## Lisans / kimlik
 

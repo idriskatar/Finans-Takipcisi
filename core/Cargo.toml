@@ -1,6 +1,6 @@
 [package]
 name = "finans-core"
-version = "1.0.0"
+version = "1.6.0"
 description = "Finans Takipçisi — paylaşılan veri motoru (Harem/TCMB/BIST/Kripto, önbellek, REST+SSE)"
 authors = ["İdris KATAR"]
 license = "MIT"

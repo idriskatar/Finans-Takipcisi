@@ -15,6 +15,7 @@ header{position:sticky;top:0;z-index:10;background:var(--panel);border-bottom:1p
 header h1{font-size:16px;margin:0;letter-spacing:.02em;color:var(--brass)}
 header .st{font-size:11.5px;color:var(--mute)}
 main{padding:12px 12px calc(104px + var(--safe-bottom,0px));max-width:760px;margin:0 auto}
+.update{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--box);border-bottom:1px solid var(--brass);padding:9px 14px;font-size:12.5px;color:var(--ink)}
 .view{display:none}.view.on{display:block}
 input[type=search],select,input[type=number]{font:inherit;font-size:13px;padding:7px 9px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:7px;min-width:0}
 input[type=search]{width:100%;margin-bottom:10px}
@@ -64,6 +65,10 @@ a{color:var(--brass)}
 <body>
 <div class="toast" id="toast" hidden></div>
 <header><h1>Finans Takipçisi</h1><span class="st" id="status">bağlanıyor…</span></header>
+<div class="update" id="updateBox" hidden>
+  <span id="updateText"></span>
+  <button class="mini" id="updateBtn">İndir</button>
+</div>
 <main>
   <section class="view on" id="v-fav">
     <div class="section">Favoriler</div>
@@ -119,7 +124,7 @@ a{color:var(--brass)}
     <div class="setting"><span>Varsayılanlar</span><button class="mini" id="setReset">Sıfırla</button></div>
     <div class="section">Hakkında</div>
     <div class="card">
-      <b>Finans Takipçisi</b> <span class="mute">v1.0.0</span>
+      <b>Finans Takipçisi</b> <span class="mute">v1.6.0</span>
       <p class="mute">Geliştirici: <b>İdris KATAR</b> · MIT Lisansı</p>
       <p>Harem Altın, BIST 100, TCMB ve Kripto piyasaları aynı ekranda izlenir.</p>
       <p class="mute">Kaynaklar: Harem Socket.IO · Borsa İstanbul / Yahoo Finance · TCMB · Binance · BtcTurk. Veriler bilgilendirme amaçlıdır, yatırım tavsiyesi değildir.</p>
@@ -216,9 +221,22 @@ $("setRefresh").onchange=e=>{ud.settings.refresh=Math.max(2,Number(e.target.valu
 $("setSpread").onchange=e=>{ud.settings.spread=Math.max(1,Number(e.target.value)||5);applySettings();persist();render()};
 $("setReset").onclick=()=>{ud.settings={...DEFAULT};applySettings();persist();render();toast("Varsayılan ayarlar geri yüklendi.")};
 
+async function checkUpdate(){
+  try{
+    const u=await invoke("check_update");
+    if(u?.available){
+      $("updateText").textContent="Yeni sürüm "+u.version+" hazır";
+      $("updateBox").hidden=false;
+      $("updateBtn").onclick=()=>invoke("open_url",{url:u.url}).catch(()=>{});
+    }
+  }catch{}
+}
+
 (async function init(){
   try{ud=await invoke("get_user_data");if(!ud||!Array.isArray(ud.favorites))ud={settings:{...DEFAULT},favorites:[]};ud.settings={...DEFAULT,...(ud.settings||{})}}catch{}
   renderChips();renderKTabs();applySettings();show("fav");await refresh();
+  await checkUpdate();
+  setInterval(checkUpdate,6*60*60*1000);
 })();
 </script>
 </body>

@@ -1,5 +1,11 @@
 # Değişiklik kaydı
 
+## 1.6.0 (2026-11-27)
+
+- GitHub Releases üzerinden otomatik güncelleme: masaüstünde imzalı Tauri updater
+  (`latest.json`), mobilde sürüm kontrolü + APK indirme şeridi.
+- Sürüm tüm platformlarda **1.6.0** olarak hizalandı.
+
 ## 1.0.0 (2026-11-23)
 
 ### Eklendi

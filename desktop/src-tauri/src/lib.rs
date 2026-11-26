@@ -5,6 +5,7 @@ const INDEX_HTML: &str = include_str!("../../frontend/index.html");
 
 pub fn run_app() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
             let data_dir = app.path().app_data_dir()?;
             let state = AppState::new(Storage::new(data_dir));

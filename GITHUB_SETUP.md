@@ -80,4 +80,6 @@ Paylaşılan `core/` sayesinde masaüstü ve mobil aynı veri motorunu kullanır
 eklerken veri katmanını `core/` içine, platforma özel kodu `desktop/` veya `mobile/` içine
 koyun. Ayrıntılar: `README.md`, `MOBILE_PLAN.md`, `CONTRIBUTING.md`.
 
+Otomatik güncelleme için gereken GitHub secret'ları ve akış: **UPDATE_SETUP.md**.
+
 Lisans: **MIT**, © 2026 İdris KATAR.
