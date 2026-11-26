@@ -40,6 +40,13 @@ git push -u origin main
 | `Build Desktop` | Windows (NSIS), macOS ARM/Intel (DMG), Linux (AppImage + deb) | GitHub **Releases** (taslak) **ve** Actions **Artifacts** |
 | `Build Mobile` | Android (**kurulabilir imzalı APK**), iOS (imzasız simulator `.app`) | GitHub **Actions > Artifacts** → `android-install-apk`, `ios-simulator-app` |
 
+Mobil favori aktarımı yerel dosya seçiciyle çalışır (`tauri-plugin-dialog`); ek GitHub
+secret veya izin gerekmez.
+
+`Build Desktop` artık paketleri yalnızca derleyip Actions **Artifacts**'a yükler;
+ayrı `release` job'u bunları indirip taslak GitHub Release'e ekler. Böylece
+`tauri-action`'ın kendi artifact araması ("No artifacts were found") devre dışıdır.
+
 Etiket göndermek:
 
 ```bash

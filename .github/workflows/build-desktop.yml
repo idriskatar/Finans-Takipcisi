@@ -14,8 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # WiX/MSI derlemesi Windows-1252 kod sayfası nedeniyle Türkçe karakterlerde
-          # başarısız oluyor (LGHT0311); bu yüzden CI'da yalnızca NSIS üretiliyor.
+          # WiX 3, CP-1252 kod sayfasında Türkçe karakterleri kodlayamadığı için MSI yapılmaz.
           - name: Windows (NSIS)
             os: windows-latest
             args: '--bundles nsis'
@@ -28,8 +27,6 @@ jobs:
           - name: Linux (AppImage + deb)
             os: ubuntu-22.04
             args: '--bundles appimage,deb'
-    permissions:
-      contents: write
 
     steps:
       - name: Kaynak kod
@@ -53,25 +50,14 @@ jobs:
         with:
           workspaces: desktop/src-tauri -> target
 
-      - name: Derle ve sürüm yayınla
-        id: tauri
+      # tagName/releaseName verilmezse action yalnızca derler; kendi artifact
+      # araması yapılmaz ("No artifacts were found" hatası ortaya çıkmaz).
+      - name: Derle
         uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: desktop/src-tauri
-          tagName: ${{ github.ref_name }}
-          releaseName: 'Finans Takipçisi v__VERSION__'
-          releaseBody: |
-            Finans Takipçisi — çok platformlu masaüstü uygulaması.
-            Geliştirici: İdris KATAR · Lisans: MIT
-            Mobil paketler ayrı workflow'larda üretilir (Actions > Artifacts).
-          releaseDraft: true
-          prerelease: false
           args: ${{ matrix.args }}
 
-      # Çapraz derlemede çıktı target/<triple>/release/bundle/ altına gider;
-      # recursive glob hem o yolu hem normal yolu kapsar.
       - name: Paketleri Actions Artifacts olarak yükle
         uses: actions/upload-artifact@v4
         with:
@@ -83,4 +69,30 @@ jobs:
             desktop/src-tauri/target/**/bundle/**/*.deb
             desktop/src-tauri/target/**/bundle/**/*.app.tar.gz
             desktop/src-tauri/target/**/bundle/**/*.app
-          if-no-files-found: warn
+          if-no-files-found: error
+
+  release:
+    name: GitHub Release (taslak)
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Artifact'leri indir
+        uses: actions/download-artifact@v4
+        with:
+          pattern: desktop-*
+          path: artifacts
+          merge-multiple: true
+
+      - name: Taslak sürüm oluştur ve paketleri ekle
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          name: Finans Takipçisi ${{ github.ref_name }}
+          body: |
+            Finans Takipçisi — çok platformlu masaüstü uygulaması.
+            Geliştirici: İdris KATAR · Lisans: MIT
+            Mobil paketler Build Mobile workflow'undaki Artifacts'tadır.
+          files: artifacts/**
