@@ -117,8 +117,17 @@ td.fav-src{font-size:12px;color:var(--mute)}
 /* Üç bar birlikte yapışır: sayfa kaydırılırken sabit bar + iki kayan bar hep görünür. */
 .stack{position:sticky;top:0;z-index:20;background:var(--panel)}
 .fixedbar{background:var(--panel);border-bottom:1px solid var(--line);box-shadow:0 6px 14px -12px rgba(0,0,0,.5)}
-.fixedbar-inner{display:flex;align-items:center;justify-content:center;justify-content:safe center;gap:3px;padding:4px 8px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none}
+/* Endeks her zaman sabit; kalan kartlar yalnızca sığmadığında kayar (JS overflow sınıfı ekler). */
+.fixedbar-inner{display:flex;align-items:center;gap:3px;padding:4px 8px;overflow:hidden;overscroll-behavior-x:contain;scrollbar-width:none}
 .fixedbar-inner::-webkit-scrollbar{display:none}
+.fb-fixed{flex:0 0 auto;display:flex;align-items:center}
+.fb-view{position:relative;flex:1 1 auto;min-width:0;overflow:hidden}
+.fb-view .track{animation:none}
+.fb-view .seq.dup{display:none}
+.fixedbar.overflow .fb-view .track{animation:marq var(--dur,40s) linear infinite}
+.fixedbar.overflow .fb-view .seq.dup{display:flex}
+.fixedbar:hover .fb-view .track{animation-play-state:paused}
+.fixedbar.overflow .fb-view::after{content:"";position:absolute;top:0;bottom:0;right:0;width:18px;pointer-events:none;background:linear-gradient(90deg,transparent,var(--panel))}
 .divider{flex:0 0 auto;width:1px;align-self:stretch;margin:2px;background:var(--line)}
 .card{flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;gap:3px;padding:0 3px;min-width:0}
 .card .nm{font-size:11px;color:var(--mute);white-space:nowrap}
@@ -138,7 +147,10 @@ td.fav-src{font-size:12px;color:var(--mute)}
 .track{display:flex;width:max-content;align-items:stretch;animation:marq var(--dur,70s) linear infinite}
 .ticker:hover .track{animation-play-state:paused}
 @keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.seq{display:flex;align-items:stretch}
+/* İçerik ekrana sığıyorsa animasyon kapanır, yinelenen kopya gizlenir (JS is-static sınıfı). */
+.ticker.is-static .track{animation:none}
+.ticker.is-static .seq.dup{display:none}
+.seq{display:flex;flex:0 0 auto;align-items:stretch}
 .stk{display:flex;align-items:center;gap:9px;padding:0 15px;border-right:1px solid var(--line);white-space:nowrap}
 .stk .t{font-size:14px;font-weight:700}
 .stk .p{font-size:14px;font-weight:650;font-variant-numeric:tabular-nums}
@@ -213,31 +225,39 @@ th.sortable .ar{font-size:9px;margin-left:3px;color:var(--brass)}
   .subtabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
   .subtabs::-webkit-scrollbar{display:none}
 }
-@media (prefers-reduced-motion:reduce){td.f-up,td.f-down{animation:none}.track{animation:none}.ticker{overflow-x:auto}}
+@media (prefers-reduced-motion:reduce){td.f-up,td.f-down{animation:none}.track{animation:none}.seq.dup{display:none}.ticker{overflow-x:auto}}
 </style>
 </head>
 <body>
 
 <div class="stack">
   <header class="fixedbar" aria-label="Özet piyasa barı">
-    <div class="fixedbar-inner" id="fixedbar"></div>
+    <div class="fixedbar-inner">
+      <div class="fb-fixed" id="fbIndex"></div>
+      <div class="fb-view" id="fbView">
+        <div class="track" id="fbTrack">
+          <div class="seq" id="fbSeqA"></div>
+          <div class="seq dup" id="fbSeqB" aria-hidden="true"></div>
+        </div>
+      </div>
+    </div>
   </header>
   <section class="ticker t1" aria-label="En çok yükselen ve düşen hisseler">
     <div class="track" style="--dur:75s">
       <div class="seq" id="stkA"></div>
-      <div class="seq" id="stkB" aria-hidden="true"></div>
+      <div class="seq dup" id="stkB" aria-hidden="true"></div>
     </div>
   </section>
   <section class="ticker t2" aria-label="Sarrafiye fiyatları">
     <div class="track" style="--dur:55s">
       <div class="seq" id="srfA"></div>
-      <div class="seq" id="srfB" aria-hidden="true"></div>
+      <div class="seq dup" id="srfB" aria-hidden="true"></div>
     </div>
   </section>
   <section class="ticker t3" aria-label="Kripto fiyatları">
     <div class="track" style="--dur:85s">
       <div class="seq" id="krA"></div>
-      <div class="seq" id="krB" aria-hidden="true"></div>
+      <div class="seq dup" id="krB" aria-hidden="true"></div>
     </div>
   </section>
 </div>
@@ -445,7 +465,7 @@ th.sortable .ar{font-size:9px;margin-left:3px;color:var(--brass)}
   <section class="pcard" id="panel-hakkinda" role="tabpanel" aria-labelledby="tab-hakkinda" hidden>
     <div class="pcard-head">
       <h2 id="hakkindaTitle">Hakkında</h2>
-      <span class="meta">Sürüm 1.6.0</span>
+      <span class="meta">Sürüm 1.6.1</span>
     </div>
     <div class="about">
       <div class="brand">FİNANS TAKİPÇİSİ</div>
@@ -709,21 +729,26 @@ const SARRAFIYE_ORDER = [
 ];
 
 function renderBars() {
-  const bar = $("fixedbar");
-  bar.textContent = "";
-  bar.append(indexCard(bist?.indexQuote), el("div", "divider"));
+  // BIST 100 endeksi her zaman sabit; diğer kartlar yalnızca sığmadığında kayar.
+  const idxBox = $("fbIndex");
+  idxBox.textContent = "";
+  idxBox.append(indexCard(bist?.indexQuote), el("div", "divider"));
 
+  const fbseq = el("div", "seq");
   const hourly = tcmb?.hourly?.items ?? {};
   for (const [code, name] of [
     ["USD", "Dolar"], ["EUR", "Euro"],
     ["GBP", "Sterlin"], ["CHF", "Frang"],
-  ]) bar.append(tcmbCard(name, hourly[code]));
-  bar.append(el("div", "divider"));
+  ]) fbseq.append(tcmbCard(name, hourly[code]));
+  fbseq.append(el("div", "divider"));
 
   for (const [code, name, full] of [
     ["ALTIN", "Gram", "Gram Altın"], ["ONS", "Ons", "Ons Altın"],
     ["CEYREK_YENI", "Çeyrek", "Çeyrek"], ["ATA_YENI", "Ata", "Ata"], ["TEK_YENI", "Tam", "Tam"],
-  ]) bar.append(priceCard(name, items.get(code), `${full} · Harem (${code})`));
+  ]) fbseq.append(priceCard(name, items.get(code), `${full} · Harem (${code})`));
+  for (const id of ["fbSeqA", "fbSeqB"]) {
+    const box = $(id); box.textContent = ""; box.append(fbseq.cloneNode(true));
+  }
 
   // 1. kayan bar: en çok yükselen / düşen 10 hisse
   const withChg = (bist?.items ?? []).filter(x => x.changePct != null);
@@ -756,7 +781,39 @@ function renderBars() {
   }
 
   renderKriptoBar();
+  applyBarFit();
 }
+
+// Sığma testi: içerik görünür alandan genişse kayan mod, değilse sabit mod.
+// Süre içerik genişliğine göre hesaplanır; kısa şerit çok hızlı akmasın.
+const MARQ_PX_PER_SEC = 45;
+const marqDuration = px => Math.min(180, Math.max(18, Math.round(px / MARQ_PX_PER_SEC))) + "s";
+
+function fitTicker(ticker) {
+  const seq = ticker.querySelector(".seq");
+  const track = ticker.querySelector(".track");
+  const scroll = seq.scrollWidth > ticker.clientWidth + 1;
+  ticker.classList.toggle("is-static", !scroll);
+  if (scroll) track.style.setProperty("--dur", marqDuration(seq.scrollWidth));
+}
+
+function applyBarFit() {
+  const fixedbar = document.querySelector(".fixedbar");
+  const view = $("fbView");
+  const seq = $("fbSeqA");
+  const scroll = seq.scrollWidth > view.clientWidth + 1;
+  fixedbar.classList.toggle("overflow", scroll);
+  if (scroll) $("fbTrack").style.setProperty("--dur", marqDuration(seq.scrollWidth));
+
+  for (const cls of ["t1", "t2", "t3"]) fitTicker(document.querySelector(".ticker." + cls));
+}
+
+// Pencere boyutu değişince karar yeniden verilir (rAF ile tek seferde).
+let fitRaf = 0;
+addEventListener("resize", () => {
+  if (fitRaf) return;
+  fitRaf = requestAnimationFrame(() => { fitRaf = 0; applyBarFit(); });
+});
 
 function scheduleBars() {
   if (barsPending || document.visibilityState !== "visible") return;

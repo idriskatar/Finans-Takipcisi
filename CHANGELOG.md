@@ -1,5 +1,11 @@
 # Değişiklik kaydı
 
+## 1.6.1 (2026-11-27)
+
+### Değiştirildi
+- Sabit bar: BIST 100 endeksi her zaman sabit kalır; döviz ve altın kartları yalnızca ekrana sığmadığında kayar hale gelir.
+- Diğer kayan barlar (yükselen/düşen hisseler, sarrafiye, kripto): içerik ekrana sığıyorsa sabit, sığmıyorsa kayar; karar pencere boyutu değiştiğinde yeniden hesaplanır ve kaydırma hızı içerik genişliğine göre ayarlanır.
+
 ## 1.6.0 (2026-11-27)
 
 ### Eklendi

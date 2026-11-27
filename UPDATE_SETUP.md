@@ -59,8 +59,8 @@ bu ayrı bir iş olarak eklenebilir.
 ## 4. Sürüm yayınlama
 
 ```bash
-git tag v1.6.0
-git push origin v1.6.0
+git tag v1.6.1
+git push origin v1.6.1
 ```
 
 - **Build Desktop** → taslak Release (exe/dmg/AppImage + `latest.json`)

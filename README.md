@@ -5,7 +5,7 @@
 
 ## ⬇️ Son sürümü indir
 
-**Güncel sürüm: v1.6.0** · [Tüm sürümler / en yenisi](https://github.com/idriskatar/Finans-Takipcisi/releases/latest)
+**Güncel sürüm: v1.6.1** · [Tüm sürümler / en yenisi](https://github.com/idriskatar/Finans-Takipcisi/releases/latest)
 
 | Platform | İndirme |
 |---|---|
