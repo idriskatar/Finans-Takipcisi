@@ -2,9 +2,24 @@
 
 ## 1.6.0 (2026-11-27)
 
+### Eklendi
 - GitHub Releases üzerinden otomatik güncelleme: masaüstünde imzalı Tauri updater
   (`latest.json`), mobilde sürüm kontrolü + APK indirme şeridi.
+
+### Değiştirildi
 - Sürüm tüm platformlarda **1.6.0** olarak hizalandı.
+
+## 1.1.0 (2026-11-25)
+
+### Eklendi
+- **Kaynak durumu paneli** (Ayarlar): Harem/TCMB/BIST/Kripto için bağlantı durumu,
+  son veri saati ve hata mesajı; disk önbelleğinden gelen veriler "son kayıt" olarak işaretli.
+- **Disk önbelleği**: son başarılı veri `app_data_dir/cache/*.json` içine yazılır; açılışta
+  ağdan önce yüklenir, çevrimdışıyken de ekran dolu kalır.
+- **Favori aktarımı**: Favoriler sekmesinde Dışa aktar / İçe aktar düğmeleri (JSON).
+- **Fiyat alarmı**: her favori için eşik fiyat ve yön (↑/↓); eşik aşılınca uygulama içi
+  bildirim, 5 dk aynı alarm tekrarı engellenir.
+- **Yeni uygulama simgesi**; pencere başlık çubuğuna da açıkça uygulandı (`image-png`).
 
 ## 1.0.0 (2026-11-23)
 
@@ -28,15 +43,3 @@
 - TCMB/BIST verisi gelmediğinde otomatik yeniden deneme eklendi: hata/boş yanıt "başarılı"
   sayılmıyor; arayüz 5 sn'de bir, sunucu 5 sn'de bir tekrar deniyor, sekme açılınca da
   hemen yenileniyor. "Yenile" tuşuna basma ihtiyacı kalktı.
-
-## 1.1.0 (2026-11-25)
-
-### Eklendi
-- **Kaynak durumu paneli** (Ayarlar): Harem/TCMB/BIST/Kripto için bağlantı durumu,
-  son veri saati ve hata mesajı; disk önbelleğinden gelen veriler "son kayıt" olarak işaretli.
-- **Disk önbelleği**: son başarılı veri `app_data_dir/cache/*.json` içine yazılır; açılışta
-  ağdan önce yüklenir, çevrimdışıyken de ekran dolu kalır.
-- **Favori aktarımı**: Favoriler sekmesinde Dışa aktar / İçe aktar düğmeleri (JSON).
-- **Fiyat alarmı**: her favori için eşik fiyat ve yön (↑/↓); eşik aşılınca uygulama içi
-  bildirim, 5 dk aynı alarm tekrarı engellenir.
-- **Yeni uygulama simgesi**; pencere başlık çubuğuna da açıkça uygulandı (`image-png`).
