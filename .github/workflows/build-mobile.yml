@@ -75,8 +75,7 @@ jobs:
           BT=$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -n 1)
           ALIGNED="$RUNNER_TEMP/aligned.apk"
           "$ANDROID_HOME/build-tools/$BT/zipalign" -f -p 4 "$UNSIGNED" "$ALIGNED"
-          VER="${GITHUB_REF_NAME#v}"
-          OUT="mobile/src-tauri/gen/android/app/build/outputs/Finans-Takipcisi-${VER}-debug-signed.apk"
+          OUT="mobile/src-tauri/gen/android/app/build/outputs/Finans-Takipcisi-Android.apk"
           "$ANDROID_HOME/build-tools/$BT/apksigner" sign \
             --ks "$KEYSTORE" --ks-key-alias androiddebugkey \
             --ks-pass pass:android --key-pass pass:android \
@@ -88,15 +87,16 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-install-apk
-          path: mobile/src-tauri/gen/android/app/build/outputs/*-debug-signed.apk
+          path: mobile/src-tauri/gen/android/app/build/outputs/Finans-Takipcisi-Android.apk
           if-no-files-found: error
 
       - name: APK'yi GitHub Release'e ekle
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          draft: true
-          files: mobile/src-tauri/gen/android/app/build/outputs/*-debug-signed.apk
+          tag_name: ${{ github.ref_name }}
+          draft: false
+          files: mobile/src-tauri/gen/android/app/build/outputs/Finans-Takipcisi-Android.apk
 
   ios:
     name: iOS (simulator .app, imzasız)

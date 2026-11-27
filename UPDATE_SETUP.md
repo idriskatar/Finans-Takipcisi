@@ -66,5 +66,7 @@ git push origin v1.6.0
 - **Build Desktop** → taslak Release (exe/dmg/AppImage + `latest.json`)
 - **Build Mobile** → `android-install-apk` artifact'i (imzalı APK)
 
-Release taslağını gözden geçirip **Publish release** yapın; masaüstü güncelleyici
-`latest.json`'u `latest` etiketi üzerinden okur.
+Sürüm **yayınlanır** (`draft: false`); aksi halde `releases/latest/download/...`
+linkleri çalışmaz. Paket adları sürümden bağımsızdır:
+`Finans-Takipcisi-Windows-setup.exe`, `Finans-Takipcisi-Android.apk` — böylece
+README'deki `latest/download` linkleri her sürümde geçerli kalır.

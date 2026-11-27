@@ -100,13 +100,25 @@ jobs:
           path: artifacts
           merge-multiple: true
 
+      - name: Paketleri sabit adlarla yeniden adlandır
+        shell: bash
+        run: |
+          WIN=$(find artifacts -type f -name '*setup.exe' | head -n 1)
+          if [ -n "$WIN" ]; then mv "$WIN" artifacts/Finans-Takipcisi-Windows-setup.exe; fi
+          DEB=$(find artifacts -type f -name '*.deb' | head -n 1)
+          if [ -n "$DEB" ]; then mv "$DEB" artifacts/Finans-Takipcisi-Linux.deb; fi
+          APPIMAGE=$(find artifacts -type f -name '*.AppImage' | head -n 1)
+          if [ -n "$APPIMAGE" ]; then mv "$APPIMAGE" artifacts/Finans-Takipcisi-Linux.AppImage; fi
+          ls -1 artifacts
+
       - name: latest.json üret (updater)
         run: node scripts/generate-latest.mjs artifacts "${GITHUB_REF_NAME#v}" "${GITHUB_REF_NAME}"
 
-      - name: Taslak sürüm oluştur ve paketleri ekle
+      - name: Sürüm oluştur ve paketleri ekle
         uses: softprops/action-gh-release@v2
         with:
-          draft: true
+          tag_name: ${{ github.ref_name }}
+          draft: false
           name: Finans Takipçisi ${{ github.ref_name }}
           body: |
             Finans Takipçisi — çok platformlu masaüstü uygulaması.

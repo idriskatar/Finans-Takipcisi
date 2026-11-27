@@ -37,13 +37,14 @@ git push -u origin main
 
 | Workflow | Job'lar | Çıktı |
 |---|---|---|
-| `Build Desktop` | Windows (NSIS), macOS ARM/Intel (DMG), Linux (AppImage + deb) | GitHub **Releases** (taslak) **ve** Actions **Artifacts** |
+| `Build Desktop` | Windows (NSIS), macOS ARM/Intel (DMG), Linux (AppImage + deb) | GitHub **Releases** (yayınlanır) **ve** Actions **Artifacts** |
 | `Build Mobile` | Android (**kurulabilir imzalı APK**), iOS (imzasız simulator `.app`) | GitHub **Actions > Artifacts** → `android-install-apk`, `ios-simulator-app` |
 
 Mobil favoriler cihazda `user-data.json` içinde saklanır; dosya aktarımı mobilde yoktur.
 
 `Build Desktop` artık paketleri yalnızca derleyip Actions **Artifacts**'a yükler;
-ayrı `release` job'u bunları indirip taslak GitHub Release'e ekler. Böylece
+ayrı `release` job'u bunları indirip GitHub Release'e ekler (etiket açıkça belirtilir,
+`untagged` oluşmaz). Böylece
 `tauri-action`'ın kendi artifact araması ("No artifacts were found") devre dışıdır.
 
 Etiket göndermek:
@@ -54,7 +55,7 @@ git push origin v1.0.0
 ```
 
 Ardından **Actions** sekmesinden derlemeleri izleyin. Desktop paketleri **Releases** altında
-taslak olarak oluşur (gözden geçirip *Publish release* yapın). Mobil paketler ilgili
+doğrudan yayınlanır (indirme linklerinin çalışması için). Mobil paketler ilgili
 workflow sayfasındaki **Artifacts** bölümünden indirilir.
 
 ### Notlar
