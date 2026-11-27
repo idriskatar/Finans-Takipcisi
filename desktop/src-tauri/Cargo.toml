@@ -1,6 +1,6 @@
 [package]
 name = "finans-takipcisi"
-version = "1.6.1"
+version = "1.6.2"
 description = "Finans Takipçisi — çok platformlu masaüstü uygulaması"
 authors = ["İdris KATAR"]
 license = "MIT"

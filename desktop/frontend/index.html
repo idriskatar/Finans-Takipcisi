@@ -25,6 +25,12 @@ try{var t=localStorage.getItem('finance.theme')||'system';if(t==='light'||t==='d
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,"Segoe UI",sans-serif}
+/* Dikey kaydırma çubuğu gizli; kaydırınca veya imleç sağ kenara gelince belirir (yer kayması yok). */
+html::-webkit-scrollbar{width:9px}
+html::-webkit-scrollbar-track{background:transparent}
+html::-webkit-scrollbar-thumb{background-color:transparent;border:2px solid transparent;border-radius:8px;background-clip:padding-box}
+html.show-scroll::-webkit-scrollbar-thumb{background-color:var(--mute)}
+html::-webkit-scrollbar-thumb:hover{background-color:var(--brass)}
 .wrap{max-width:1100px;margin:0 auto;padding:20px 16px 48px}
 .wrap > header{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-bottom:16px}
 h1{margin:0;font-size:22px;font-weight:650;letter-spacing:-.01em}
@@ -118,10 +124,12 @@ td.fav-src{font-size:12px;color:var(--mute)}
 .stack{position:sticky;top:0;z-index:20;background:var(--panel)}
 .fixedbar{background:var(--panel);border-bottom:1px solid var(--line);box-shadow:0 6px 14px -12px rgba(0,0,0,.5)}
 /* Endeks her zaman sabit; kalan kartlar yalnızca sığmadığında kayar (JS overflow sınıfı ekler). */
-.fixedbar-inner{display:flex;align-items:center;gap:3px;padding:4px 8px;overflow:hidden;overscroll-behavior-x:contain;scrollbar-width:none}
+.fixedbar-inner{display:flex;align-items:center;justify-content:center;gap:3px;padding:4px 8px;overflow:hidden;overscroll-behavior-x:contain;scrollbar-width:none}
 .fixedbar-inner::-webkit-scrollbar{display:none}
 .fb-fixed{flex:0 0 auto;display:flex;align-items:center}
-.fb-view{position:relative;flex:1 1 auto;min-width:0;overflow:hidden}
+.fb-view{position:relative;flex:0 0 auto;min-width:0;overflow:hidden}
+.fixedbar.overflow .fixedbar-inner{justify-content:flex-start}
+.fixedbar.overflow .fb-view{flex:1 1 auto}
 .fb-view .track{animation:none}
 .fb-view .seq.dup{display:none}
 .fixedbar.overflow .fb-view .track{animation:marq var(--dur,40s) linear infinite}
@@ -148,7 +156,7 @@ td.fav-src{font-size:12px;color:var(--mute)}
 .ticker:hover .track{animation-play-state:paused}
 @keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 /* İçerik ekrana sığıyorsa animasyon kapanır, yinelenen kopya gizlenir (JS is-static sınıfı). */
-.ticker.is-static .track{animation:none}
+.ticker.is-static .track{width:100%;justify-content:center;animation:none}
 .ticker.is-static .seq.dup{display:none}
 .seq{display:flex;flex:0 0 auto;align-items:stretch}
 .stk{display:flex;align-items:center;gap:9px;padding:0 15px;border-right:1px solid var(--line);white-space:nowrap}
@@ -465,7 +473,7 @@ th.sortable .ar{font-size:9px;margin-left:3px;color:var(--brass)}
   <section class="pcard" id="panel-hakkinda" role="tabpanel" aria-labelledby="tab-hakkinda" hidden>
     <div class="pcard-head">
       <h2 id="hakkindaTitle">Hakkında</h2>
-      <span class="meta">Sürüm 1.6.1</span>
+      <span class="meta">Sürüm 1.6.2</span>
     </div>
     <div class="about">
       <div class="brand">FİNANS TAKİPÇİSİ</div>
@@ -799,9 +807,10 @@ function fitTicker(ticker) {
 
 function applyBarFit() {
   const fixedbar = document.querySelector(".fixedbar");
-  const view = $("fbView");
+  const inner = fixedbar.querySelector(".fixedbar-inner");
   const seq = $("fbSeqA");
-  const scroll = seq.scrollWidth > view.clientWidth + 1;
+  // Sığma testi tüm satırı baz alır: endeks sabit kalırken kalan kartlar kayar.
+  const scroll = $("fbIndex").getBoundingClientRect().width + seq.scrollWidth + 19 > inner.clientWidth;
   fixedbar.classList.toggle("overflow", scroll);
   if (scroll) $("fbTrack").style.setProperty("--dur", marqDuration(seq.scrollWidth));
 
@@ -814,6 +823,18 @@ addEventListener("resize", () => {
   if (fitRaf) return;
   fitRaf = requestAnimationFrame(() => { fitRaf = 0; applyBarFit(); });
 });
+
+// Dikey kaydırma çubuğu varsayılan gizli; kaydırma sırasında ve imleç sağ kenardayken görünür.
+let scrollHintTimer = 0;
+function revealScrollbar() {
+  document.documentElement.classList.add("show-scroll");
+  clearTimeout(scrollHintTimer);
+  scrollHintTimer = setTimeout(() => document.documentElement.classList.remove("show-scroll"), 1400);
+}
+addEventListener("scroll", revealScrollbar, { passive: true });
+addEventListener("mousemove", e => {
+  if (e.clientX > innerWidth - 18) revealScrollbar();
+}, { passive: true });
 
 function scheduleBars() {
   if (barsPending || document.visibilityState !== "visible") return;

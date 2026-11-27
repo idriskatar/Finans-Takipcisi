@@ -1139,7 +1139,7 @@ dependencies = [
 
 [[package]]
 name = "finans-core"
-version = "1.6.1"
+version = "1.6.2"
 dependencies = [
  "axum",
  "chrono",
@@ -1155,7 +1155,7 @@ dependencies = [
 
 [[package]]
 name = "finans-takipcisi-mobile"
-version = "1.6.1"
+version = "1.6.2"
 dependencies = [
  "finans-core",
  "reqwest 0.12.28",

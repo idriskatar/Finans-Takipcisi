@@ -1,5 +1,14 @@
 # Değişiklik kaydı
 
+## 1.6.2 (2026-11-27)
+
+### Değiştirildi
+- Ekrana sığan sabit üst bar ve kayan barlar artık ortalanıyor; sola dayalı kalma giderildi.
+- Dikey kaydırma çubuğu varsayılan olarak gizli; imleç sağ kenara geldiğinde veya sayfa kaydırıldığında belirip kısa süre sonra yeniden kayboluyor. Çubuk görünürken sayfa genişliği değişmiyor.
+
+### Düzeltildi
+- Üst barda sığma ölçümü yalnızca kayar alanı değil, sabit endeks kartı dahil tüm satırı baz alıyor.
+
 ## 1.6.1 (2026-11-27)
 
 ### Değiştirildi
