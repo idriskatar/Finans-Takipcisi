@@ -1,5 +1,14 @@
 # Değişiklik kaydı
 
+## 1.6.4 (2026-11-27)
+
+### Eklendi
+- Masaüstü: açılışta imzalı GitHub `latest.json` üzerinden sürüm kontrolü ve yeni sürüm bulunduğunda uygulama içi güncelleme popup'ı.
+- Masaüstü Ayarlar bölümüne güncelleme durumu ve "İndir ve yükle" düğmesi; yeni sürüm yoksa indirme seçeneği görünmüyor.
+
+### Değiştirildi
+- Sürüm kontrolü açılışta, Ayarlar açıldığında ve 6 saatte bir yapılıyor; indirme/updater Rust tarafındaki Tauri updater komutlarıyla gerçekleşiyor.
+
 ## 1.6.3 (2026-11-27)
 
 ### Düzeltildi

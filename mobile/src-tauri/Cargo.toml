@@ -1,6 +1,6 @@
 [package]
 name = "finans-takipcisi-mobile"
-version = "1.6.3"
+version = "1.6.4"
 description = "Finans Takipçisi — mobil (Android/iOS)"
 authors = ["İdris KATAR"]
 license = "MIT"

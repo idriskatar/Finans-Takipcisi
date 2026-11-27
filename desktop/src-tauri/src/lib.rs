@@ -1,11 +1,44 @@
 use finans_core::{server, sources, state::AppState, storage::Storage};
+use serde_json::{json, Value};
 use tauri::Manager;
+use tauri_plugin_updater::UpdaterExt;
 
 const INDEX_HTML: &str = include_str!("../../frontend/index.html");
+
+/// GitHub `latest.json` üzerinden yeni sürüm kontrolü (açılışta ve Ayarlar'da çağrılır).
+#[tauri::command]
+async fn check_update(app: tauri::AppHandle) -> Result<Value, String> {
+    let updater = app.updater_builder().build().map_err(|e| e.to_string())?;
+    match updater.check().await.map_err(|e| e.to_string())? {
+        Some(update) => Ok(json!({
+            "available": true,
+            "version": update.version,
+            "current": update.current_version,
+            "notes": update.body.unwrap_or_default(),
+        })),
+        None => Ok(json!({ "available": false })),
+    }
+}
+
+/// İmzalı paketi indirir, kurar ve uygulamayı yeniden başlatır.
+#[tauri::command]
+async fn install_update(app: tauri::AppHandle) -> Result<(), String> {
+    let updater = app.updater_builder().build().map_err(|e| e.to_string())?;
+    let update = updater
+        .check()
+        .await
+        .map_err(|e| e.to_string())?
+        .ok_or_else(|| "Yeni sürüm bulunamadı".to_string())?;
+    update
+        .download_and_install(|_, _| {}, || {})
+        .await
+        .map_err(|e| e.to_string())
+}
 
 pub fn run_app() {
     tauri::Builder::default()
         .plugin(tauri_plugin_updater::Builder::new().build())
+        .invoke_handler(tauri::generate_handler![check_update, install_update])
         .setup(|app| {
             let data_dir = app.path().app_data_dir()?;
             let state = AppState::new(Storage::new(data_dir));

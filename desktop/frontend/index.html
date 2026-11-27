@@ -31,6 +31,16 @@ html::-webkit-scrollbar-track{background:transparent}
 html::-webkit-scrollbar-thumb{background-color:transparent;border:2px solid transparent;border-radius:8px;background-clip:padding-box}
 html.show-scroll::-webkit-scrollbar-thumb{background-color:var(--mute)}
 html::-webkit-scrollbar-thumb:hover{background-color:var(--brass)}
+[hidden]{display:none!important}
+/* güncelleme popup'ı */
+.modal{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(10,14,20,.55)}
+.modal-card{width:min(440px,100%);background:var(--panel);border:1px solid var(--brass);border-radius:14px;padding:20px 22px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.modal-card h2{margin:0 0 8px;font-size:18px;letter-spacing:-.01em}
+.modal-card p{margin:0 0 10px;font-size:13.5px;color:var(--mute)}
+.modal-card pre{margin:0 0 16px;max-height:180px;overflow:auto;white-space:pre-wrap;font:12.5px/1.5 system-ui,sans-serif;color:var(--ink);background:var(--box);border:1px solid var(--box-line);border-radius:8px;padding:10px 12px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px}
+button.ghost.primary{background:var(--brass);border-color:var(--brass);color:#fff;font-weight:650}
+@media (prefers-color-scheme:dark){button.ghost.primary{color:#1a1500}}
 .wrap{max-width:1100px;margin:0 auto;padding:20px 16px 48px}
 .wrap > header{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-bottom:16px}
 h1{margin:0;font-size:22px;font-weight:650;letter-spacing:-.01em}
@@ -468,12 +478,22 @@ th.sortable .ar{font-size:9px;margin-left:3px;color:var(--brass)}
         <button class="ghost" id="setReset" type="button">Varsayılanlara dön</button>
       </div>
     </div>
+
+    <div class="subhead" style="margin-top:18px">
+      <h3 class="sub">Güncelleme</h3>
+    </div>
+    <div class="settings">
+      <div class="setrow">
+        <div><b>Yeni sürüm</b><small id="updateStatus">Sürüm kontrolü yapılıyor…</small></div>
+        <button class="ghost" id="updateDownload" type="button" hidden>İndir ve yükle</button>
+      </div>
+    </div>
   </section>
 
   <section class="pcard" id="panel-hakkinda" role="tabpanel" aria-labelledby="tab-hakkinda" hidden>
     <div class="pcard-head">
       <h2 id="hakkindaTitle">Hakkında</h2>
-      <span class="meta">Sürüm 1.6.3</span>
+      <span class="meta">Sürüm 1.6.4</span>
     </div>
     <div class="about">
       <div class="brand">FİNANS TAKİPÇİSİ</div>
@@ -495,6 +515,18 @@ th.sortable .ar{font-size:9px;margin-left:3px;color:var(--brass)}
       <p class="muted">Veriler bilgilendirme amaçlıdır, yatırım tavsiyesi değildir.</p>
     </div>
   </section>
+</div>
+
+<div class="modal" id="updateModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="updateModalTitle">
+    <h2 id="updateModalTitle">Yeni sürüm hazır</h2>
+    <p id="updateModalText"></p>
+    <pre id="updateNotes" hidden></pre>
+    <div class="modal-actions">
+      <button class="ghost" id="updateLater" type="button">Sonra</button>
+      <button class="ghost primary" id="updateNow" type="button">İndir ve yükle</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -915,6 +947,7 @@ for (const [key, label] of PANELS) {
     // Sekme açıldığında veri hâlâ yoksa hemen yeniden dene (Yenile'ye basmaya gerek yok).
     if (key === "tcmb" && !tcmbHasData()) loadTcmb();
     if (key === "bist" && !bistHasData()) loadBist();
+    if (key === "ayarlar") checkForUpdate(false);
   };
   mainTabs.append(b);
 }
@@ -1904,6 +1937,73 @@ function updateStatus() {
 }
 
 health(); setInterval(health, 4000);
+
+// ---------- Güncelleme (Tauri updater) ----------
+const tauriInvoke = (cmd, args = {}) => {
+  const i = window.__TAURI_INTERNALS__?.invoke ?? window.__TAURI__?.core?.invoke;
+  return i ? i(cmd, args) : Promise.reject(new Error("Tauri IPC kullanılamıyor"));
+};
+let updateInfo = null, updateBusy = false;
+
+function renderUpdateState() {
+  const status = $("updateStatus"), btn = $("updateDownload");
+  if (updateInfo?.available) {
+    status.textContent = `v${updateInfo.version} hazır (güncel: v${updateInfo.current})`;
+    btn.hidden = false;
+  } else {
+    status.textContent = updateInfo?.current ? `Güncel (v${updateInfo.current})` : "Yeni sürüm yok";
+    btn.hidden = true;
+  }
+}
+
+function showUpdatePopup() {
+  if (!updateInfo?.available) return;
+  $("updateModalText").textContent =
+    `Sürüm v${updateInfo.version} indirilip kurulabilir. Uygulama yeniden başlatılacak.`;
+  const notes = $("updateNotes");
+  notes.textContent = updateInfo.notes || "";
+  notes.hidden = !updateInfo.notes;
+  $("updateModal").hidden = false;
+}
+
+async function checkForUpdate(showPopup = false) {
+  try {
+    updateInfo = await tauriInvoke("check_update");
+    renderUpdateState();
+    if (showPopup) showUpdatePopup();
+  } catch {
+    if (!updateInfo) $("updateStatus").textContent = "Sürüm kontrolü yapılamadı";
+  }
+}
+
+async function installUpdate() {
+  if (updateBusy || !updateInfo?.available) return;
+  updateBusy = true;
+  const label = $("updateDownload").textContent;
+  for (const b of [$("updateDownload"), $("updateNow")]) {
+    b.textContent = "İndiriliyor…"; b.disabled = true;
+  }
+  try {
+    await tauriInvoke("install_update");
+    toast("Güncelleme kuruluyor; uygulama yeniden başlayacak.");
+  } catch (e) {
+    toast("Güncelleme başarısız: " + (e?.message || e));
+    $("updateDownload").textContent = label;
+    $("updateNow").textContent = "İndir ve yükle";
+    $("updateDownload").disabled = $("updateNow").disabled = false;
+  } finally {
+    updateBusy = false;
+  }
+}
+
+$("updateDownload").onclick = installUpdate;
+$("updateNow").onclick = installUpdate;
+$("updateLater").onclick = () => { $("updateModal").hidden = true; };
+$("updateModal").onclick = e => { if (e.target === $("updateModal")) $("updateModal").hidden = true; };
+
+// Açılışta bir kez, Ayarlar açıldığında ve 6 saatte bir.
+checkForUpdate(true);
+setInterval(() => checkForUpdate(false), 6 * 60 * 60 * 1000);
 
 // ---------- TCMB / BIST / kripto tazeleme ----------
 loadUserData();
