@@ -18,6 +18,10 @@ Repo → **Settings → Secrets and variables → Actions → New repository sec
 > Özel anahtar **asla** depoya eklenmez. Zip içinde de yoktur.
 > Daha önce eklediyseniz **eski `TAURI_SIGNING_PRIVATE_KEY` secret'ını yeni değerle
 > güncelleyin** ve şifreyi `finans` yapın. Eski anahtar base64 çözümleme hatası veriyordu.
+>
+> Workflow secret değerindeki boşluk/tırnak/satır sonunu temizleyip dosyaya yazıyor
+> (beklenen uzunluk **348 karakter**). Logda `anahtar uzunluğu: 348` görmelisiniz.
+> Farklı bir sayı görürseniz secret değeri yanlış kopyalanmış demektir.
 
 Genel anahtar `desktop/src-tauri/tauri.conf.json` içinde zaten tanımlı; değiştirmeyin.
 

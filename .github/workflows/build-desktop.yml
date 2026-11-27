@@ -50,12 +50,20 @@ jobs:
         with:
           workspaces: desktop/src-tauri -> target
 
+      # Secret değerinde boşluk/tırnak/ satır sonu olabiliyor; dosyaya normalizasyon
+      # yapıp Tauri'ye ham metin yerine anahtar dosyası yolunu veriyoruz.
+      - name: İmzalama anahtarını hazırla
+        shell: bash
+        run: |
+          printf '%s' '${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}' | tr -d '[:space:]"' > "$RUNNER_TEMP/tauri.key"
+          echo "anahtar uzunluğu: $(wc -c < "$RUNNER_TEMP/tauri.key") (beklenen: 348)"
+
       # tagName/releaseName verilmezse action yalnızca derler; kendi artifact
       # araması yapılmaz ("No artifacts were found" hatası ortaya çıkmaz).
       - name: Derle
         uses: tauri-apps/tauri-action@v0
         env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ runner.temp }}/tauri.key
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: finans
         with:
           projectPath: desktop/src-tauri
