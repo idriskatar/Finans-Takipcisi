@@ -3,6 +3,18 @@
 Çok platformlu finans takip uygulaması: **Rust + Tauri**.
 **Geliştirici: İdris KATAR** · **Lisans: MIT**
 
+## ⬇️ Son sürümü indir
+
+**Güncel sürüm: v1.6.0** · [Tüm sürümler / en yenisi](https://github.com/idriskatar/Finans-Takipcisi/releases/latest)
+
+| Platform | İndirme |
+|---|---|
+| **Windows** (kurulum paketi) | [Finans Takipçisi_1.6.0_x64-setup.exe](https://github.com/idriskatar/Finans-Takipcisi/releases/download/v1.6.0/Finans%20Takip%C3%A7isi_1.6.0_x64-setup.exe) |
+| **Android** (telefona kurulabilir APK) | [Finans-Takipcisi-1.6.0-debug-signed.apk](https://github.com/idriskatar/Finans-Takipcisi/releases/download/v1.6.0/Finans-Takipcisi-1.6.0-debug-signed.apk) |
+| **macOS / Linux** | [Releases sayfasından indirin](https://github.com/idriskatar/Finans-Takipcisi/releases/latest) |
+
+> Uygulama açılışta GitHub'dan yeni sürüm kontrolü yapar. Masaüstünde güncelleme onayla birlikte kurulur; mobilde **"Yeni sürüm hazır · İndir"** şeridi APK bağlantısını açar. Ayrıntılar: `UPDATE_SETUP.md`.
+
 ## Proje yapısı
 
 | Klasör | Açıklama |
