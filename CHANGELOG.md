@@ -1,5 +1,10 @@
 # Değişiklik kaydı
 
+## 1.6.3 (2026-11-27)
+
+### Düzeltildi
+- Mobil: yeni sürüm yokken de üstte görünen "İndir" şeridi kaldırıldı. `hidden` niteliği artık `display` atayan sınıflar tarafından geçersiz kılınmıyor; sürüm güncel olduğunda, kontrol başarısız olduğunda veya APK bağlantısı bulunmadığında şerit kapalı kalıyor.
+
 ## 1.6.2 (2026-11-27)
 
 ### Değiştirildi

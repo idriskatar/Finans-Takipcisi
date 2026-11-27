@@ -10,6 +10,8 @@
 :root{color-scheme:light dark;--bg:#eef0f2;--panel:#fff;--ink:#1a1f27;--mute:#6b7380;--line:#dde1e6;--brass:#8a6210;--up:#157a66;--down:#b83a32;--warn:#a35a00;--box:#f4f6f8;--boxline:#e3e7ec}
 :root[data-theme=dark]{--bg:#12161c;--panel:#1a2029;--ink:#e8ebef;--mute:#8d96a3;--line:#2b333f;--brass:#d9a840;--up:#43c4a8;--down:#ef7a70;--warn:#e0a24a;--box:#222a35;--boxline:#333d4a}
 *{box-sizing:border-box}
+/* display atayan sınıflar hidden niteliğini geçersiz kılmasın (güncelleme şeridi, toast). */
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,"Segoe UI",sans-serif}
 header{position:sticky;top:0;z-index:10;background:var(--panel);border-bottom:1px solid var(--line);padding:calc(10px + var(--safe-top,env(safe-area-inset-top,0px))) 14px 10px;display:flex;align-items:center;justify-content:space-between}
 header h1{font-size:16px;margin:0;letter-spacing:.02em;color:var(--brass)}
@@ -124,7 +126,7 @@ a{color:var(--brass)}
     <div class="setting"><span>Varsayılanlar</span><button class="mini" id="setReset">Sıfırla</button></div>
     <div class="section">Hakkında</div>
     <div class="card">
-      <b>Finans Takipçisi</b> <span class="mute">v1.6.2</span>
+      <b>Finans Takipçisi</b> <span class="mute">v1.6.3</span>
       <p class="mute">Geliştirici: <b>İdris KATAR</b> · MIT Lisansı</p>
       <p>Harem Altın, BIST 100, TCMB ve Kripto piyasaları aynı ekranda izlenir.</p>
       <p class="mute">Kaynaklar: Harem Socket.IO · Borsa İstanbul / Yahoo Finance · TCMB · Binance · BtcTurk. Veriler bilgilendirme amaçlıdır, yatırım tavsiyesi değildir.</p>
@@ -224,12 +226,15 @@ $("setReset").onclick=()=>{ud.settings={...DEFAULT};applySettings();persist();re
 async function checkUpdate(){
   try{
     const u=await invoke("check_update");
-    if(u?.available){
+    if(u?.available&&u.url){
       $("updateText").textContent="Yeni sürüm "+u.version+" hazır";
       $("updateBox").hidden=false;
       $("updateBtn").onclick=()=>invoke("open_url",{url:u.url}).catch(()=>{});
+    }else{
+      $("updateBox").hidden=true;
+      $("updateBtn").onclick=null;
     }
-  }catch{}
+  }catch{$("updateBox").hidden=true;$("updateBtn").onclick=null}
 }
 
 (async function init(){
